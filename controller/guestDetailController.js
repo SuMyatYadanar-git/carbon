@@ -1,7 +1,7 @@
 const {sub,set,add,parseISO,format,isBefore}  = require('date-fns')
 const {  validationResult } = require('express-validator');
 const {postGuestDetailService,newsLetterService,getNewsletter,postUserFeedbackService} =require('../service/guestService')
-const error_code = require('../error')
+
 
 const postGuestDetail =(req,res)=>{
 	const errors = validationResult(req)
@@ -28,7 +28,7 @@ const postGuestDetail =(req,res)=>{
                 error:-1004,
             })
         }else{
-            console.log(error,'guest_detail')
+            console.log(err,'guest_detail')
             return  res.status(503).json({
 					// error:error_code["-1008"],
 					success:false,

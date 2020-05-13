@@ -2,7 +2,7 @@ const mysql = require('mysql2')
 
 const con1 = mysql.createConnection({
     host     : 'localhost',
-    user     : 'root',
+    user     : 'kumo99',
     password : 'root',
     database : 'carbon_offset_db'
   })

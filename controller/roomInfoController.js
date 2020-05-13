@@ -162,7 +162,7 @@ const getHotelInfo=(req,res)=>{
             error:null,
         })
     })
-    .catch(err =>{
+    .catch(error =>{
         if(error.errno == 1054 ){
             return res.status(400).json({
                 // error:error_code["-1004"],
