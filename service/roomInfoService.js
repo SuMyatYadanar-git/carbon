@@ -299,9 +299,9 @@ const oneHourScheduler = () => {
           endTs: dateFns.format(dateFns.subSeconds(currentDate, 1), dateFormat),
           dataColor,
         };
-
         resultedArray.push(resultedData);
-        db.saveResultedData(resultedData);
+        // const officeCoolingLoad = isNaN(resultData.officeCoolingLoad)
+        db.saveResultedData(resultData);
       });
 
       // save resultedData as a row in db (historical data purpose)
