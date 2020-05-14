@@ -2,7 +2,7 @@ const db = require("../db/carbonoffset_db");
 const moment = require('moment')
 const { sub, set, add, parseISO, format, isBefore } = require("date-fns");
 const dateFns = require("date-fns")
-var subHours = require('date-fns/subHours')
+const dateFnsZone = require("date-fns-tz")
 
 // median
 const isMedian = (values) => {
@@ -18,13 +18,14 @@ const isMedian = (values) => {
 // developed by @nayhtet
 const oneHourScheduler = () => {
   // console.log('onehourschedular start',dateFns.format(new Date(),'yyyy-MM-dd HH:mm:ss'))
-   const currentDate = new Date(2020, 3, 28, 1, 0, 0) 
+  const timezone = "Asia/Singapore"
+   const currentDate = new Date(2020, 3, 28, 1, 0, 0)
   // const currentDate =  new Date()  new Date(2020, 4, 13, 1, 0, 0)
   const startDate = dateFns.subHours(currentDate, 1)
   const dateFormat = "yyyy-MM-dd HH:mm:ss"
   console.log("startDate: ", startDate, 'currentDate=>',currentDate, dateFns.format(startDate, dateFormat))
  
-  const power202 = ["ppssbms0013","ppssbms0014","ppssbms0015","ppssbms0016","ppssbms0017","ppssbms0018","ppssbms0019","ppssbms001a","ppssbms001b","ppssbms001c","ppssbms001d"]
+  const power202 = ["ppssbms0013","ppssbms0014","ppssbms0015","ppssbms0016","ppssbms0017","ppssbms0018","ppssbms0019","ppssbms001a","ppssbms001b","ppssbms001c",]
   const temp202 = ["ppssbms001f"]
   const flow202 = ["ppssbms001d","ppssbms0023"]
   const temp114 = ["ppssbms0024","ppssbms0025"]
@@ -37,12 +38,12 @@ const oneHourScheduler = () => {
   const officeCoolingLoadTempOutSql = `select temp1 as value, ts from dTemperature where ieee in ('${temp114[0]}') and ts between '${dateFns.format(startDate, dateFormat)}' and '${dateFns.format(currentDate, dateFormat)}' and temp1 is not null and temp1>0 order by temp1 asc`
   const officeCoolingLoadTempOutPromise = db.runIotMgmtQuery("m114", officeCoolingLoadTempOutSql)
   // Office cooling
-  const hotelCoolingLoadFlowRateSql = `select flowRate as value, ts from ultrasonicFlow2 where ieee in ('${flow202[1]}') and ts between '${dateFns.format(startDate, dateFormat)}' and '${dateFns.format(currentDate, dateFormat)}' and flowRate is not null and flowRate>0 order by flowRate asc`
+  const hotelCoolingLoadFlowRateSql = `select flowRate as value, ts from ultrasonicFlow2 where ieee in ('${flow202[0]}') and ts between '${dateFns.format(startDate, dateFormat)}' and '${dateFns.format(currentDate, dateFormat)}' and flowRate is not null and flowRate>0 order by flowRate asc`
   const hotelCoolingLoadFlowRatePromise = db.runIotMgmtQuery("m202", hotelCoolingLoadFlowRateSql)
   const hotelCoolingLoadTempInSql = `select temp2 as value, ts from dTemperature where ieee in ('${temp202[0]}') and ts between '${dateFns.format(startDate, dateFormat)}' and '${dateFns.format(currentDate, dateFormat)}' and temp2 is not null and temp2>0 order by temp2 asc`
-  const hotelCoolingLoadTempInPromise = db.runIotMgmtQuery("m114", hotelCoolingLoadTempInSql)
+  const hotelCoolingLoadTempInPromise = db.runIotMgmtQuery("m202", hotelCoolingLoadTempInSql)
   const hotelCoolingLoadTempOutSql = `select temp1 as value, ts from dTemperature where ieee in ('${temp202[0]}') and ts between '${dateFns.format(startDate, dateFormat)}' and '${dateFns.format(currentDate, dateFormat)}' and temp1 is not null and temp1>0 order by temp1 asc`
-  const hotelCoolingLoadTempOutPromise = db.runIotMgmtQuery("m114", hotelCoolingLoadTempOutSql)
+  const hotelCoolingLoadTempOutPromise = db.runIotMgmtQuery("m202", hotelCoolingLoadTempOutSql)
 
   const powerDataSql = `select ch1Watt as value, ieee, ts from pm where ieee in (${getCommaSeparatedString(power202)}) and ts between '${dateFns.format(startDate, dateFormat)}' and '${dateFns.format(currentDate, dateFormat)}' and ch1Watt is not null and ch1Watt>0 order by value asc`
   const powerDataPromise = db.runIotMgmtQuery("m202", powerDataSql)
@@ -88,7 +89,7 @@ const oneHourScheduler = () => {
     //   officeCoolingLoadTempIn, 
     //   officeCoolingLoadTempOut, 
     //   hotelCoolingLoadFlowRate, 
-    //   hotelCoolingLoadTempIn: dataArray[4][0], 
+    //   hotelCoolingLoadTempIn, 
     //   hotelCoolingLoadTempOut, 
     //   powerData,
     // })
@@ -127,7 +128,7 @@ const oneHourScheduler = () => {
     .reduce((r,c) => r+(c/1000),0)///1000
     
     const officeCoolingLoad = (4.2 * 997 * officeCoolingLoadFlowRateMedian * (officeCoolingLoadTempInMedian-officeCoolingLoadTempOutMedian)) / (3600 * 3.51685)
-    const hotelCoolingLoad = 197.91875258/*(4.2 * 997 * hotelCoolingLoadFlowRateMedian * (hotelCoolingLoadTempInMedian-hotelCoolingLoadTempOutMedian)) / (3600 * 3.51685)*/
+    const hotelCoolingLoad = (4.2 * 997 * hotelCoolingLoadFlowRateMedian * (hotelCoolingLoadTempInMedian-hotelCoolingLoadTempOutMedian)) / (3600 * 3.51685)
     const totalCoolingLoad = officeCoolingLoad + hotelCoolingLoad
     const plantEfficiency = powerDataTotal/totalCoolingLoad // should be around 0.6 // ask detail about efficiency calculation also coolingLoads
     
