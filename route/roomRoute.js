@@ -17,7 +17,7 @@ router.get("/carbon/:id",roomInfoController.getRoomCarbonFootPrint)
 
 // http://sample.evercomm.com/reports/room_data?start_date=2020-03-03&end_date=2020-03-04&hotel_id=1&room_no=301
 // http://localhost:5000/reports/room_data/?start_date=2020-03-03&end_date=2020-03-04&hotel_id=1&room_no=301
-router.get("/",roomInfoController.getRoomData)
+// router.get("/",roomInfoController.getRoomData)
 
 // http://localhost:5000/reports/room_data/hotel_info
 // http://sample.evercomm.com/reports/room_data/hotel_info
