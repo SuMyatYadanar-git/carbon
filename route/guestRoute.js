@@ -23,6 +23,7 @@ router.post('/guest-detail',[
 
  // http://localhost:5000/reports/newsletter post
 //  https://sample.evercomm.com/reports/newsletter
+// "email":"lucy1@gmail.com"
 router.post('/newsletter',[
     check('email').isEmail().exists().trim()
     .withMessage('Email is already exists!!!')

@@ -2,7 +2,7 @@ const mysql = require('mysql2')
 
 const con1 = mysql.createConnection({
     host     : 'localhost',
-    user     : 'kumo99',
+    user     : 'root',//kumo99
     password : 'root',
     database : 'carbon_offset_db'
   })
@@ -11,36 +11,26 @@ const con1 = mysql.createConnection({
     port     :'33061',
     user     : 'kumo',
     password : 'kumo99',
-    database : 'iotmgmt'
+    database : 'iotdata'
   })
 
   const con2 = mysql.createConnection({
     host     : '202.73.49.62',
     user     : 'ecoui',
     password : 'ECO4ui17',
-    database : 'iotmgmt'
+    //  database : 'iotmgmt'
+     database : 'iotdata'
   })
 
-
-// const getFlowRate =(startDate,endDate)=>{
-//   return con2.promise().query(`SELECT flowRate,date_format(ts,'%Y-%m-%d %H-%i-00') as ts  FROM ppss_orchard_road.plant_eva_flowrate where ts between '${startDate}' and '${endDate}' group by date_format(ts,'%Y-%m-%d %H-%i-00') `)
-//  }
-// const getCh1EvaReturnAndSupply=(startDate,endDate)=>{
-//   return con2.promise().query(`SELECT temp2-temp1 as temp,date_format(ts,'%Y-%m-%d %H-%i-00') as ts FROM ppss_orchard_road.ch1_eva_return_supply_temp where ts between '${startDate}' and '${endDate}' group by date_format(ts,'%Y-%m-%d %H-%i-00') `)
-// }
-
-// const getCh1Power=(startDate,endDate)=>{
-//   return con2.promise().query(`SELECT sum(ch1Watt+ch2Watt+ch3Watt)/1000 as power,date_format(ts,'%Y-%m-%d %H-%i-00') as ts FROM ch1_component_power where ts between '${startDate}' and '${endDate}' group by date_format(ts,'%Y-%m-%d %H-%i-00') `)
-// }
-
-// const getCh2Power=(startDate,endDate)=>{
-//   return con2.promise().query(`SELECT sum(ch1Watt+ch2Watt+ch3Watt)/1000 as power,date_format(ts,'%Y-%m-%d %H-%i-00') as ts FROM ch2_component_power where ts between '${startDate}' and '${endDate}' group by date_format(ts,'%Y-%m-%d %H-%i-00') `)
-// }
-
-// const getCh2EvaReturnAndSupply=(startDate,endDate)=>{
-//   return con2.promise().query(`SELECT temp2-temp1 as temp,date_format(ts,'%Y-%m-%d %H-%i-00') as ts FROM ppss_orchard_road.ch2_eva_return_supply_temp where ts between '${startDate}' and '${endDate}' group by date_format(ts,'%Y-%m-%d %H-%i-00') `)
-// }
-
+ // developed by @nayhtet
+// m114 or m202
+const runIotMgmtQuery = (db="m114", query) => {
+  if(db==="m114") {
+    return con3.promise().query(query)
+  } else { // suppose m202
+    return con2.promise().query(query)
+  }
+} 
 //  =============================================================================================
 const chilled_water_flow_office = (startDate,endDate)=>{
   return con2.promise().query(`SELECT flowRate,date_format(ts,'%Y-%m-%d %H-%i-00') as ts  FROM ultrasonicFlow2 where ts between '${startDate}' and '${endDate}' and gatewayId=113 and ieee='ppssbms0023' group by date_format(ts,'%Y-%m-%d %H-%i-00')`)
@@ -88,6 +78,27 @@ const cooling_tower=(startDate,endDate)=>{
   return con2.promise().query(`SELECT ch1Watt ,date_format(ts,'%Y-%m-%d %H-%i-00') as ts FROM pm where gatewayId=113 and ieee='ppssbms001c' and ts between '${startDate}' and '${endDate}' group by date_format(ts,'%Y-%m-%d %H-%i-00')`)
 }
 // ====================================================================================================
+// @lucy
+const saveResultedData=(data)=>{
+  return con1
+    .promise()
+    .query(`
+      insert into 
+        resulted_data(roomNo, coolingRequired, roomType, officeCoolingLoad,hotelCoolingLoad,powerDataTotal,plantEfficiency,energyConsumption,startTs,endTs,dataColor) 
+        values (
+          ${data.roomNo},
+          ${data.coolingRequired},
+          '${data.roomType}',
+          ${data.officeCoolingLoad},
+          ${data.hotelCoolingLoad},
+          ${data.powerDataTotal},
+          ${data.plantEfficiency},
+          ${data.energyConsumption},
+          '${data.startTs}',
+          '${data.endTs}',
+          '${data.dataColor}')`
+    )
+}
 const saveFourHourCalculatedData=(efficiency,ts)=>{
   return con1.promise().query(`insert into four_hour_calculated_data(ts,efficiency) values ('${ts}',${efficiency})`)
 }
@@ -103,19 +114,9 @@ const loadMedianEfficiency=()=>{
 const efficiencyMedianValue=(startDate,endDate)=>{
   return con1.promise().query(`select * from four_hour_calculated_data where ts between '${startDate}' and '${endDate}'`)
 }
-// const getRoomInfo=()=>{
-//   return con1.promise().query(`select distinct(room_type) as room_type,cooling_per_room from room_info`)
-// }
-const getRoomInfo=()=>{
-  return con1.promise().query(`select * from room_info`)
-}
+
 const saveOneHourCalculatedData=(ts,roomType,kWH)=>{
   return con1.promise().query(`insert into one_hour_calculated_data(ts,room_type,kWh) values(?,?,?)`,[ts,roomType,kWH])
-}
-// get room info by id
-const getRoomInfoById=(room_id,hotel_id)=>{
-  // SELECT * FROM carbon_offset_db.room_info where room_id=301 and hotel_id=1
-   return con1.promise().query(`select * from room_info where room_no=${room_id} and hotel_id=${hotel_id}`)
 }
 
 // get hourly room  energyConsumption old-version
@@ -123,16 +124,17 @@ const hourlyRoomEnergyConsumption=(id,startDate,endDate)=>{
   return con1.promise().query(`SELECT room_info.room_size_m2 as room_area, room_info.room_size_m2/room_info.cooling_required  as cooling, one_hour_calculated_data.kWh as kWh,one_hour_calculated_data.ts as ts,room_info.room_no as room_no,room_info.room_type as room_type from room_info inner join 
   one_hour_calculated_data on room_info.room_type=one_hour_calculated_data.room_type where room_info.room_no=${id} and one_hour_calculated_data.ts between '${startDate}' and '${endDate}' `)
  }
-// new-version
-// const hourlyRoomEnergyConsumption=(id,startDate,endDate)=>{
-//   return con1.promise().query(`SELECT room_info.room_area as room_area, room_info.cooling_per_room as cooling, one_hour_calculated_data.kWh as kWh,one_hour_calculated_data.ts as ts,room_info.room_no as room_no,room_info.room_type as room_type from room_info inner join 
-//   one_hour_calculated_data on room_info.room_type=one_hour_calculated_data.room_type where room_info.room_no=${id} and one_hour_calculated_data.ts between '${startDate}' and '${endDate}' `)
-//  }
-//  const hourlyRoomEnergyConsumption=(id,startDate,endDate)=>{
-//   return con1.promise().query(`SELECT room_info.room_area as room_area, (room_info.room_size_m2)/(room_info.cooling_required) as cooling, four_hour_calculated_data.efficiency as kWh,four_hour_calculated_data.ts as ts,room_info.room_no as room_no,room_info.room_type as room_type from room_info inner join 
-//   four_hour_calculated_data on room_info.room_type=one_hour_calculated_data.room_type where room_info.room_no=${id} and one_hour_calculated_data.ts between '${startDate}' and '${endDate}' `)
-//  }
-
+// get room info by id
+const getRoomInfoById=(room_id,hotel_id)=>{
+  // SELECT * FROM carbon_offset_db.room_info where room_id=301 and hotel_id=1
+   return con1.promise().query(`select * from room_info where room_no=${room_id} and hotel_id=${hotel_id}`)
+}
+const getRoomInfo=()=>{
+  return con1.promise().query(`select * from room_info`)
+}
+// const getRoomInfo=()=>{
+//   return con1.promise().query(`select distinct(room_type) as room_type,cooling_per_room from room_info`)
+// }
 //get coefficient
 const getCoefficient=()=>{
   return con1.promise().query(`select * from coefficient`)
@@ -161,9 +163,7 @@ const postUserFeedback=(hours,room_temp,hotel_temp)=>{
 
 
 module.exports={
-  // old-version
-//  getFlowRate,getCh1EvaReturnAndSupply,getCh1Power,
-//  getCh2Power,getCh2EvaReturnAndSupply,
+
  saveFourHourCalculatedData,getEFficiencyMedian,getRoomInfo,
  saveOneHourCalculatedData,getRoomInfoById,getCoefficient,hourlyRoomEnergyConsumption,getHotelInfo,
  // guest
@@ -172,5 +172,7 @@ module.exports={
 chilled_water_flow_office,chilled_water_flow,hotel_plant_cooling_temp,
 ch1,ch2,ch3,eva_water_pump1,eva_water_pump2,eva_water_pump3,con_water_pump1,con_water_pump2,con_water_pump3,cooling_tower,
 efficiencyMedianValue,office_temp_0025,office_temp_0024,loadMedianEfficiency,
+saveResultedData,
+runIotMgmtQuery,
 }  
  

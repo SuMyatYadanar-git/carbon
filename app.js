@@ -26,31 +26,32 @@ app.use(bodyParser.json())
 app.use(morgan("dev"));
 app.use(router)
 
-app.use((req,res,next)=>{
-    const error = new Error('Not found!')
-    error.status =404
-    next(error)
-  })
-  app.use((error,req,res,next)=>{
-    error.status !== 404?
-    res.status(500).json({success:false,error:-1003,})
-    :
-    res.status(404).json({success:false,error:-1002,})
-  })
-
-
-// const job1 = new CronJob('0 */01 * * * *', service.fourHourScheduler)0 0 */01 * * *
-// const job2=new CronJob('0 */01 * * * *', service.oneHourScheduler)
-
-const job1 = new CronJob('0 */1 * * *', service.fourHourScheduler)
-const job2=new CronJob('0 */1 * * *', service.oneHourScheduler)
+// app.use((req,res,next)=>{
+//     const error = new Error('Not found!')
+//     error.status =404
+//     next(error)
+//   })
+//   app.use((error,req,res,next)=>{
+//     error.status !== 404?
+//     res.status(500).json({success:false,error:-1003,})
+//     :
+//     res.status(404).json({success:false,error:-1002,})
+//   })
+  app.get("/test-calculation", (req, res) => {
+    service.oneHourScheduler()
+      .then(data => res.json(data))
+      .catch(error => res.status(400).json({error: error.toString()}))
+  }) 
+// 0 0 */01 * * *
+const job1 = new CronJob('* */1 * * *', service.fourHourScheduler)
+// const job2=new CronJob('* * */01 * *', service.oneHourScheduler)
 // const job1 = new CronJob('* */01 * * *', service.fourHourScheduler)
-// const job2=new CronJob('* */01 * * *', service.oneHourScheduler)
+//  const job2=new CronJob('* */01 * * *', service.oneHourScheduler)
 app.listen(port,hostname,(err)=>{
     if(err){
         console.log("server not responding",err)
     }else
     console.log(`server up and running at http://localhost:${port} `)
-       job1.start()
-       job2.start()
+        // job1.start()
+      //  job2.start()
     })
