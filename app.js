@@ -10,7 +10,7 @@ const error_code = require("./error.js");
 // const router = require('./route/roomRoute.js')
 
 const app = express();
-const port = 5000;
+const port = 5055;
 const hostname = "localhost"; // http://sample.evercomm.com
 app.use((req, res, next) => {
   res.setHeader("Access-Control-Allow-Origin", "*");

@@ -299,7 +299,7 @@ const oneHourScheduler = () => {
           dataColor,
         };
         resultedArray.push(resultedData);
-        db.saveResultedData(resultData);
+        db.saveResultedData(resultedData);
         // if (
         //   isNaN(officeCoolingLoad) &&
         //   isNaN(hotelCoolingLoad) &&
