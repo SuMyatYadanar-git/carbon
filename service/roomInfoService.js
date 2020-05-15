@@ -9,7 +9,7 @@ const dateFnsZone = require("date-fns-tz");
 const oneHourScheduler = () => {
   // new Date(2020,3,28,1,0,0)
   const timezone = "Asia/Singapore";
-  const cDate = dateFnsZone.utcToZonedTime(new Date(), timezone);
+  const cDate = dateFnsZone.utcToZonedTime(new Date(2020,3,28,1,0,0), timezone);
   const currentDate = dateFns.setSeconds(dateFns.setMinutes(cDate, 0), 0); // HH:00:00
 
   const startDate = dateFns.subHours(currentDate, 1);
@@ -284,58 +284,39 @@ const oneHourScheduler = () => {
             : energyConsumption > 0.4
             ? "Red"
             : "-";
-        // const resultedData = {
-        //   roomNo: room.room_no,
-        //   roomType: room.room_type,
-        //   officeCoolingLoad,
-        //   hotelCoolingLoad,
-        //   // totalCoolingLoad,
-        //   coolingRequired,
-        //   powerDataTotal,
-        //   plantEfficiency,
-        //   energyConsumption,
-        //   startTs: dateFns.format(startDate, dateFormat),
-        //   endTs: dateFns.format(dateFns.subSeconds(currentDate, 1), dateFormat),
-        //   dataColor,
-        // };
-        // resultedArray.push(resultedData);
-        // db.saveResultedData(resultedData);
+        const resultedData = {
+          roomNo: room.room_no,
+          roomType: room.room_type,
+          officeCoolingLoad,
+          hotelCoolingLoad,
+          // totalCoolingLoad,
+          coolingRequired,
+          powerDataTotal,
+          plantEfficiency,
+          energyConsumption,
+          startTs: dateFns.format(startDate, dateFormat),
+          endTs: dateFns.format(dateFns.subSeconds(currentDate, 1), dateFormat),
+          dataColor,
+        };
+        resultedArray.push(resultedData);
+        db.saveResultedData(resultedData);
+  // check nan value before save in database
         // if (
         //   isNaN(officeCoolingLoad) &&
         //   isNaN(hotelCoolingLoad) &&
-        //   isNaN(cooling_required) &&
+        //   // isNaN(cooling_required) &&
         //   isNaN(powerDataTotal) &&
         //   isNaN(plantEfficiency) &&
         //   isNaN(energyConsumption) &&
         //   room.room_no &&
-        //   room.room_type &&
+        //   // room.room_type &&
         //   room.room_type != ""
         // ) {
-        //   const resultedData = {
-        //     roomNo: room.room_no,
-        //     roomType: room.room_type,
-        //     officeCoolingLoad,
-        //     hotelCoolingLoad,
-        //     // totalCoolingLoad,
-        //     coolingRequired,
-        //     powerDataTotal,
-        //     plantEfficiency,
-        //     energyConsumption,
-        //     startTs: dateFns.format(startDate, dateFormat),
-        //     endTs: dateFns.format(
-        //       dateFns.subSeconds(currentDate, 1),
-        //       dateFormat
-        //     ),
-        //     dataColor,
-        //   };
-        //   resultedArray.push(resultedData);
-        //   db.saveResultedData(resultData);
-        // } else {
-        //   // const sDate = dateFns.subHours(currentDate, 4);
-        //    const sDate = new Date(2020,3,28)
-        //   const date = dateFnsZone.format(sDate, dateFormat, {
-        //     timeZone: timezone,
-        //   });
+        //   console.log('nanblock1-->',isNaN(officeCoolingLoad))
+        //   const sDate = dateFns.subHours(currentDate, 1);
+        //   const date= dateFnsZone.format(sDate, dateFormat, { timeZone: timezone })
+        //   //  const sDate = new Date(2020,3,28)
+        //   //  const date = dateFns.subHours(sDate,1)
         //   return db
         //     .getResultedData(date)
         //     .then((data) => {
@@ -354,16 +335,38 @@ const oneHourScheduler = () => {
         //           dataColor,
         //         };
         //       });
-        //       resultedArray.push(save);
+        //       console.log(save,'Return save')
+        //       // return save;
+        //       // resultedArray.push(save);
         //       db.saveResultedData(save);
         //     })
         //     .catch((error) => {
         //       throw error;
         //     });
+        // } else {
+        //   // console.log('nanblock2-->',isNaN(officeCoolingLoad))
+        //   const resultedData = {
+        //     roomNo: room.room_no,
+        //     roomType: room.room_type,
+        //     officeCoolingLoad,
+        //     hotelCoolingLoad,
+        //     // totalCoolingLoad,
+        //     coolingRequired,
+        //     powerDataTotal,
+        //     plantEfficiency,
+        //     energyConsumption,
+        //     startTs: dateFns.format(startDate, dateFormat),
+        //     endTs: dateFns.format(
+        //       dateFns.subSeconds(currentDate, 1),
+        //       dateFormat
+        //     ),
+        //     dataColor,
+        //   };
+        //   resultedArray.push(resultedData);
+        //   db.saveResultedData(resultedData);
         // }
       });
-      // save resultedData as a row in db (historical data purpose)
-      // each data will be saved in every hour as this method will only called at first second of every hour
+  // each data will be saved in every hour as this method will only called at first second of every hour,// save resultedData as a row in db (historical data purpose)
       return resultedArray;
     })
     .catch((error) => {

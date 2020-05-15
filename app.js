@@ -10,8 +10,8 @@ const error_code = require("./error.js");
 // const router = require('./route/roomRoute.js')
 
 const app = express();
-const port = 5000;
-const hostname = "localhost"; // http://sample.evercomm.com
+const port = 5055;
+// http://sample.evercomm.com
 app.use((req, res, next) => {
   res.setHeader("Access-Control-Allow-Origin", "*");
   res.setHeader("Access-Control-Allow-Methods", "GET, *POST*, PUT, DELETE");
@@ -35,21 +35,13 @@ app.get('/hi',(req,res)=>{
 //     .then((data) => res.json(data))
 //     .catch((error) => res.status(400).json({ error: error.toString() }));
 // });
-app.use((req, res, next) => {
-  const error = new Error("Not found!");
-  error.status = 404;
-  next(error);
-});
-app.use((error, req, res, next) => {
-  error.status !== 404
-    ? res.status(500).json({ success: false, error: -1003 })
-    : res.status(404).json({ success: false, error: -1002 });
-});
+
 // 0 0 */01 * * *
 // * * */01 * *
 // run every one hour
-const job1 = new CronJob("0 0 */01 * * *", service.oneHourScheduler);
-app.listen(port, hostname, (err,req,res) => {
+ const job1 = new CronJob("0 0 */01 * * *", service.oneHourScheduler);
+// const job1 = new CronJob("0 */01 * * * *", service.oneHourScheduler);
+app.listen(port, (err,req,res) => {
   if (err) {
     console.log("server not responding", err);
     res.json({ success:false,err})
