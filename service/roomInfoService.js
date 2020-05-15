@@ -284,13 +284,12 @@ const oneHourScheduler = () => {
             : energyConsumption > 0.4
             ? "Red"
             : "-";
-
         const resultedData = {
           roomNo: room.room_no,
           roomType: room.room_type,
           officeCoolingLoad,
           hotelCoolingLoad,
-          totalCoolingLoad,
+          // totalCoolingLoad,
           coolingRequired,
           powerDataTotal,
           plantEfficiency,
@@ -300,10 +299,69 @@ const oneHourScheduler = () => {
           dataColor,
         };
         resultedArray.push(resultedData);
-        // const officeCoolingLoad = isNaN(resultData.officeCoolingLoad)
         db.saveResultedData(resultData);
+        // if (
+        //   isNaN(officeCoolingLoad) &&
+        //   isNaN(hotelCoolingLoad) &&
+        //   isNaN(cooling_required) &&
+        //   isNaN(powerDataTotal) &&
+        //   isNaN(plantEfficiency) &&
+        //   isNaN(energyConsumption) &&
+        //   room.room_no &&
+        //   room.room_type &&
+        //   room.room_type != ""
+        // ) {
+        //   const resultedData = {
+        //     roomNo: room.room_no,
+        //     roomType: room.room_type,
+        //     officeCoolingLoad,
+        //     hotelCoolingLoad,
+        //     // totalCoolingLoad,
+        //     coolingRequired,
+        //     powerDataTotal,
+        //     plantEfficiency,
+        //     energyConsumption,
+        //     startTs: dateFns.format(startDate, dateFormat),
+        //     endTs: dateFns.format(
+        //       dateFns.subSeconds(currentDate, 1),
+        //       dateFormat
+        //     ),
+        //     dataColor,
+        //   };
+        //   resultedArray.push(resultedData);
+        //   db.saveResultedData(resultData);
+        // } else {
+        //   // const sDate = dateFns.subHours(currentDate, 4);
+        //    const sDate = new Date(2020,3,28)
+        //   const date = dateFnsZone.format(sDate, dateFormat, {
+        //     timeZone: timezone,
+        //   });
+        //   return db
+        //     .getResultedData(date)
+        //     .then((data) => {
+        //       const save = data[0].map((v) => {
+        //         return {
+        //           roomNo: v.roomNo,
+        //           roomType: v.roomType,
+        //           officeCoolingLoad: v.officeCoolingLoad,
+        //           hotelCoolingLoad: v.hotelCoolingLoad,
+        //           coolingRequired: v.coolingRequired,
+        //           powerDataTotal: v.powerDataTotal,
+        //           plantEfficiency: v.plantEfficiency,
+        //           energyConsumption: v.energyConsumption,
+        //           startTs: dateFns.format(startDate, dateFormat),
+        //           // endTs: dateFns.format(dateFns.subSeconds(currentDate, 1), dateFormat),
+        //           dataColor,
+        //         };
+        //       });
+        //       resultedArray.push(save);
+        //       db.saveResultedData(save);
+        //     })
+        //     .catch((error) => {
+        //       throw error;
+        //     });
+        // }
       });
-
       // save resultedData as a row in db (historical data purpose)
       // each data will be saved in every hour as this method will only called at first second of every hour
       return resultedArray;
@@ -322,7 +380,7 @@ const getCommaSeparatedString = (arr, quote = true) => {
 // ==========================================================================================================
 //get room energy consumption by id ,startdate,enddate
 const getRoomEnergyConsumption = (no, startDate, endDate) => {
-  return db.oneHourEnergyConsumption(no, startDate, endDate)
+  return db.oneHourEnergyConsumption(no, startDate, endDate);
 };
 
 //get room carbon footprint by id,startdate,enddate
@@ -332,10 +390,10 @@ const getRoomCarbonFootPrint = async (id, startDate, endDate) => {
     .hourlyRoomEnergyConsumption(id, startDate, endDate)
     .then((data) => {
       // const Coefficient = coefficient.reduce((r,c)=> { return r+c.coefficient},null) ;
-      const totalEnergy = data[0].reduce((r, c) => r + c.energyConsumption, 0)
+      const totalEnergy = data[0].reduce((r, c) => r + c.energyConsumption, 0);
       const carbon = totalEnergy * 0.4;
       const offset = carbon * 1.43033;
-      return { carbon, offset, unit: "SGD",totalEnergy, };
+      return { carbon, offset, unit: "SGD", totalEnergy };
     })
     .catch((error) => {
       console.log(error, "in carbon footprint calcul");
@@ -381,7 +439,7 @@ const getRoomData = (startDate, endDate, hotel_id, room_id) => {
   return Promise.all([promise1, promise2])
 
     .then((values) => {
-    console.log(values[0][0],values[1][0],'---->V')
+      // console.log(values[0][0], values[1][0], "---->V");
       const roomData = values[0][0];
       if (roomData.length > 0) {
         const room = roomData.map((v0) => {

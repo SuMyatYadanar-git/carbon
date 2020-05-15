@@ -44,7 +44,8 @@ app.use((error, req, res, next) => {
 });
 // 0 0 */01 * * *
 // * * */01 * *
-const job1 = new CronJob("0 0 */01 * * *", service.oneHourScheduler);
+// const job1 = new CronJob("0 0 */01 * * *", service.oneHourScheduler);
+const job1 = new CronJob("0 */01 * * * *", service.oneHourScheduler);
 app.listen(port, hostname, (err) => {
   if (err) {
     console.log("server not responding", err);

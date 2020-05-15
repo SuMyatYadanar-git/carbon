@@ -2,7 +2,7 @@ const mysql = require("mysql2");
 
 const con1 = mysql.createConnection({
   host: "localhost",
-  user: "root", //kumo99
+  user: "kumo99", 
   password: "root",
   database: "carbon_offset_db",
 });
@@ -36,20 +36,7 @@ const runIotMgmtQuery = (db = "m114", query) => {
 // ====================================================================================================
 // @lucy
 const saveResultedData = (data) => {
-  console.log(`
-  insert into 
-    resulted_data(roomNo, coolingRequired, roomType, officeCoolingLoad,hotelCoolingLoad,powerDataTotal,plantEfficiency,energyConsumption,startTs,dataColor) 
-    values (
-      ${data.roomNo},
-      ${data.coolingRequired},
-      '${data.roomType}',
-      ${data.officeCoolingLoad},
-      ${data.hotelCoolingLoad},
-      ${data.powerDataTotal},
-      ${data.plantEfficiency},
-      ${data.energyConsumption},
-      '${data.startTs}',
-      '${data.dataColor}')`);
+  console.log(data,'data save query')
   return con1.promise().query(`
       insert into 
         resulted_data(roomNo, coolingRequired, roomType, officeCoolingLoad,hotelCoolingLoad,powerDataTotal,plantEfficiency,energyConsumption,startTs,dataColor) 
@@ -65,6 +52,10 @@ const saveResultedData = (data) => {
           '${data.startTs}',
           '${data.dataColor}')`);
 };
+// const getResultedData =(date)=>{
+//   console.log(date,'query')
+//   return con1.promise().query(`select * from resulted_data where startTs='${date}'`)
+// }
 
 // one-hour energy-consumption for room_id,startdate and enddate
 const oneHourEnergyConsumption =(no,startDate,endDate)=>{
@@ -137,6 +128,7 @@ const postUserFeedback = (hours, room_temp, hotel_temp) => {
 module.exports = {
   saveResultedData,
   runIotMgmtQuery,
+  // getResultedData,
   getRoomInfo,
   getRoomInfoById,
   getCoefficient,
