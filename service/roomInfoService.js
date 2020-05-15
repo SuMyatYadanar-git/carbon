@@ -9,7 +9,7 @@ const dateFnsZone = require("date-fns-tz");
 const oneHourScheduler = () => {
   // new Date(2020,3,28,1,0,0)
   const timezone = "Asia/Singapore";
-  const cDate = dateFnsZone.utcToZonedTime(new Date(2020,3,28,1,0,0), timezone);
+  const cDate = dateFnsZone.utcToZonedTime(new Date(), timezone);
   const currentDate = dateFns.setSeconds(dateFns.setMinutes(cDate, 0), 0); // HH:00:00
 
   const startDate = dateFns.subHours(currentDate, 1);
@@ -433,8 +433,11 @@ const getRoomInfoById = (room_id, hotel_id) => {
 const getMedianEfficiency = (ts) => {
   return db.getEFficiencyMedian(ts);
 };
-
-// room data
+// get hotel-info service
+const getHotelInfoData = () => {
+  return db.getHotelInfo();
+};
+// room data not using
 const getRoomData = (startDate, endDate, hotel_id, room_id) => {
   const promise1 = getRoomInfoById(room_id, hotel_id);
   const promise2 = getRoomEnergyConsumption(room_id, startDate, endDate);
@@ -472,10 +475,6 @@ const getRoomData = (startDate, endDate, hotel_id, room_id) => {
       console.log(error);
       return error;
     });
-};
-// get hotel-info service
-const getHotelInfoData = () => {
-  return db.getHotelInfo();
 };
 
 module.exports = {

@@ -40,11 +40,10 @@ app.get('/hi',(req,res)=>{
 // * * */01 * *
 // run every one hour
  const job1 = new CronJob("0 0 */01 * * *", service.oneHourScheduler);
-// const job1 = new CronJob("0 */01 * * * *", service.oneHourScheduler);
-app.listen(port, (err,req,res) => {
+//  const job1 = new CronJob("0 */01 * * * *", service.oneHourScheduler);
+app.listen(port, (err) => {
   if (err) {
     console.log("server not responding", err);
-    res.json({ success:false,err})
   } else console.log(`server up and running at http://localhost:${port} `);
   job1.start();
 });

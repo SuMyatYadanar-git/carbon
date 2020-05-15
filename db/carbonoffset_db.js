@@ -42,7 +42,7 @@ const runIotMgmtQuery = (db = "m114", query) => {
 // ====================================================================================================
 // @lucy
 const saveResultedData = (data) => {
-  // console.log(data,'data save query')
+ console.log(data,'data save query')
   return con1.promise().query(`
       insert into 
         resulted_data(roomNo, coolingRequired, roomType, officeCoolingLoad,hotelCoolingLoad,powerDataTotal,plantEfficiency,energyConsumption,startTs,dataColor) 
