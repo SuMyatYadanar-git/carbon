@@ -14,6 +14,8 @@ const oneHourScheduler = () => {
 
   const startDate = dateFns.subHours(currentDate, 1);
   const dateFormat = "yyyy-MM-dd HH:mm:ss";
+
+  
   console.log(
     "startDate: ",
     startDate,

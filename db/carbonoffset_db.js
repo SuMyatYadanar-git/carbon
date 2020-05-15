@@ -1,4 +1,5 @@
-const mysql = require("mysql2");
+ const mysql = require("mysql2");
+
 
 const con1 = mysql.createConnection({
   host: "localhost",
@@ -20,6 +21,18 @@ const con3 = mysql.createConnection({
   database: "iotmgmt",
   //  database : 'iotdata'
 });
+handleDisconnect(con3);
+function handleDisconnect(client) {
+  client.on('error', function (error) {
+    if (!error.fatal) return;
+    // console.log("error myar", error)
+    if (error.code !== 'PROTOCOL_CONNECTION_LOST') throw error;
+    console.error('> Re-connecting lost MySQL connection: ' + error.stack);
+    let mysqlClient = mysql.createConnection(client.config);
+    handleDisconnect(mysqlClient);
+    mysqlClient.connect();
+  });
+};
 
 const con2 = mysql.createConnection({
   host: "202.73.49.62",
