@@ -284,22 +284,22 @@ const oneHourScheduler = () => {
             : energyConsumption > 0.4
             ? "Red"
             : "-";
-        const resultedData = {
-          roomNo: room.room_no,
-          roomType: room.room_type,
-          officeCoolingLoad,
-          hotelCoolingLoad,
-          // totalCoolingLoad,
-          coolingRequired,
-          powerDataTotal,
-          plantEfficiency,
-          energyConsumption,
-          startTs: dateFns.format(startDate, dateFormat),
-          endTs: dateFns.format(dateFns.subSeconds(currentDate, 1), dateFormat),
-          dataColor,
-        };
-        resultedArray.push(resultedData);
-        db.saveResultedData(resultedData);
+        // const resultedData = {
+        //   roomNo: room.room_no,
+        //   roomType: room.room_type,
+        //   officeCoolingLoad,
+        //   hotelCoolingLoad,
+        //   // totalCoolingLoad,
+        //   coolingRequired,
+        //   powerDataTotal,
+        //   plantEfficiency,
+        //   energyConsumption,
+        //   startTs: dateFns.format(startDate, dateFormat),
+        //   endTs: dateFns.format(dateFns.subSeconds(currentDate, 1), dateFormat),
+        //   dataColor,
+        // };
+        // resultedArray.push(resultedData);
+        // db.saveResultedData(resultedData);
         // if (
         //   isNaN(officeCoolingLoad) &&
         //   isNaN(hotelCoolingLoad) &&
@@ -385,7 +385,7 @@ const getRoomEnergyConsumption = (no, startDate, endDate) => {
 
 //get room carbon footprint by id,startdate,enddate
 const getRoomCarbonFootPrint = async (id, startDate, endDate) => {
-  const coefficient = await getCoefficient();
+  // const coefficient = await getCoefficient();
   return db
     .hourlyRoomEnergyConsumption(id, startDate, endDate)
     .then((data) => {
@@ -403,14 +403,14 @@ const getRoomCarbonFootPrint = async (id, startDate, endDate) => {
 // ====================================================================
 
 //get coefficient
-const getCoefficient = () => {
-  return db
-    .getCoefficient()
-    .then((data) => {
-      return data[0];
-    })
-    .catch((error) => console.log(error, "in get coefficient"));
-};
+// const getCoefficient = () => {
+//   return db
+//     .getCoefficient()
+//     .then((data) => {
+//       return data[0];
+//     })
+//     .catch((error) => console.log(error, "in get coefficient"));
+// };
 const getRoomInfo = () => {
   return db
     .getRoomInfo()

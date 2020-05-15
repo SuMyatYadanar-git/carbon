@@ -30,9 +30,18 @@ router.post('/newsletter',[
 ],guestDetailController.newsLetter)
 
  // http://localhost:5000/reports/user-feedback post
+//  {
+//     "hours": " 05:28:00",
+//     "room_temp_level": "normal" ,
+//     "hotel_temp_level":"cold" 
+//   }
 router.post('/user-feedback',[
-    // ('^([01]?[0-9]|2[0-3]):[0-5][0-9]$'))
-    check('hours').matches(new RegExp('^([01]?[0-9]|2[0-3]):[0-5][0-9]$')).withMessage('invalid value!'),
+     check('hours').trim(),
+    //  .isISO8601()
+    //  .withMessage('hours must be in correct format hh:mm:ss,00:00:00'),
+    // .isISO8601('yyyy-mm-dd')
+    // .matches('^([0-9]|0[0-9]|1[0-9]|2[0-3]):[0-5][0-9]$')
+    // .withMessage('hours must be in correct format yyyy-mm-dd hh:mm:ss ,00:00:00'),
     check('room_temp_level').trim(),
     check('hotel_temp_level').trim()
 ],guestDetailController.postUserFeedback)

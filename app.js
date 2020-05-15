@@ -10,7 +10,7 @@ const error_code = require("./error.js");
 // const router = require('./route/roomRoute.js')
 
 const app = express();
-const port = 5055;
+const port = 5000;
 const hostname = "localhost"; // http://sample.evercomm.com
 app.use((req, res, next) => {
   res.setHeader("Access-Control-Allow-Origin", "*");
@@ -26,6 +26,9 @@ app.use(bodyParser.json());
 app.use(morgan("dev"));
 app.use(router);
 
+app.get('/hi',(req,res)=>{
+  return res.json('hello server')
+})
 // app.get("/test-calculation", (req, res) => {
 //   service
 //     .oneHourScheduler()
@@ -44,10 +47,12 @@ app.use((error, req, res, next) => {
 });
 // 0 0 */01 * * *
 // * * */01 * *
+// run every one hour
 const job1 = new CronJob("0 0 */01 * * *", service.oneHourScheduler);
-app.listen(port, hostname, (err) => {
+app.listen(port, hostname, (err,req,res) => {
   if (err) {
     console.log("server not responding", err);
+    res.json({ success:false,err})
   } else console.log(`server up and running at http://localhost:${port} `);
   job1.start();
 });

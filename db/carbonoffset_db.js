@@ -87,9 +87,9 @@ const getRoomInfo = () => {
 };
 
 //get coefficient
-const getCoefficient = () => {
-  return con1.promise().query(`select * from coefficient`);
-};
+// const getCoefficient = () => {
+//   return con1.promise().query(`select * from coefficient`);
+// };
 // get hotel-info
 const getHotelInfo = () => {
   return con1.promise().query(`select * from hotel_info`);
@@ -122,6 +122,7 @@ const newsLetterMailExist = (email) => {
     .query(`select email from news_letter_tbl where email='${email}'`);
 };
 const postUserFeedback = (hours, room_temp, hotel_temp) => {
+  console.log(hours,room_temp,hotel_temp,'query')
   return con1
     .promise()
     .query(
@@ -137,7 +138,7 @@ module.exports = {
   // getResultedData,
   getRoomInfo,
   getRoomInfoById,
-  getCoefficient,
+  // getCoefficientgetCoefficient,
   oneHourEnergyConsumption,
   hourlyRoomEnergyConsumption,
   getHotelInfo,

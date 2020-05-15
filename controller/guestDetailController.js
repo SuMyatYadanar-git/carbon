@@ -1,4 +1,7 @@
-const {sub,set,add,parseISO,format,isBefore}  = require('date-fns')
+
+const { sub, set, add, parseISO, format, isBefore } = require("date-fns");
+const dateFns = require("date-fns");
+const dateFnsZone = require("date-fns-tz");
 const {  validationResult } = require('express-validator');
 const {postGuestDetailService,newsLetterService,getNewsletter,postUserFeedbackService} =require('../service/guestService')
 
@@ -82,6 +85,7 @@ const newsLetter=async(req,res)=>{
 	}
 
 	const postUserFeedback =(req,res)=>{
+		// console.log('hello feedback',req.body.hours)
 		const errors = validationResult(req)
 		if (!errors.isEmpty()) {
 		  return res.status(422).json({ 
@@ -90,7 +94,7 @@ const newsLetter=async(req,res)=>{
 			message: errors.array() 
 		})
 		}
-		const hours= parseISO(req.body.hours,"HH:mm")
+		const hours = req.body.hours
 		const room_temp = req.body.room_temp_level
 		const hotel_temp = req.body.hotel_temp_level
 		return postUserFeedbackService(hours,room_temp,hotel_temp)
