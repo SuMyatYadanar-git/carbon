@@ -4,23 +4,33 @@ const { sub, set, add, parseISO, format, isBefore } = require("date-fns");
 const dateFns = require("date-fns");
 const dateFnsZone = require("date-fns-tz");
 
-// developed by @nayhtet
-// make sure to call this method once an hour
-const oneHourScheduler = () => {
+// auto-run
+const oneHourSchedulerAuto = () => {
   // new Date(2020,3,28,1,0,0)
-  const timezone = "Asia/Singapore";
+  
+     const timezone = "Asia/Singapore";
+    // const timezone = "Asia/Yangon";
+
   const cDate = dateFnsZone.utcToZonedTime(new Date(), timezone);
   const currentDate = dateFns.setSeconds(dateFns.setMinutes(cDate, 0), 0); // HH:00:00
 
+  oneHourScheduler(currentDate)
+}
+
+// developed by @nayhtet
+// make sure to call this method once an hour
+const oneHourScheduler = (currentDate) => {
   const startDate = dateFns.subHours(currentDate, 1);
   const dateFormat = "yyyy-MM-dd HH:mm:ss";
 
-  
+   const timezone = "Asia/Singapore";
+    // const timezone = "Asia/Yangon";
+
   console.log(
     "startDate: ",
-    startDate,
-    "currentDate=>",
-    dateFnsZone.format(startDate, dateFormat, { timeZone: timezone })
+    dateFnsZone.format(startDate, dateFormat, { timeZone: timezone }),
+    "currentDate: ",
+    dateFnsZone.format(currentDate, dateFormat, { timeZone: timezone })
   );
 
   const power202 = [
@@ -49,6 +59,7 @@ const oneHourScheduler = () => {
     currentDate,
     dateFormat
   )}' and flowRate is not null and flowRate>0 order by flowRate asc`;
+  console.log('officeflowRateSQL->',officeCoolingLoadFlowRateSql)
   const officeCoolingLoadFlowRatePromise = db.runIotMgmtQuery(
     "m202",
     officeCoolingLoadFlowRateSql
@@ -62,6 +73,7 @@ const oneHourScheduler = () => {
     currentDate,
     dateFormat
   )}' and temp1 is not null and temp1>0 order by temp1 asc`;
+  console.log('officeCoolingLoadTempInSql->',officeCoolingLoadTempInSql)
   const officeCoolingLoadTempInPromise = db.runIotMgmtQuery(
     "m114",
     officeCoolingLoadTempInSql
@@ -89,6 +101,7 @@ const oneHourScheduler = () => {
     currentDate,
     dateFormat
   )}' and flowRate is not null and flowRate>0 order by flowRate asc`;
+  console.log('hotelCoolingLoadFlowRateSql->',hotelCoolingLoadFlowRateSql)
   const hotelCoolingLoadFlowRatePromise = db.runIotMgmtQuery(
     "m202",
     hotelCoolingLoadFlowRateSql
@@ -102,6 +115,7 @@ const oneHourScheduler = () => {
     currentDate,
     dateFormat
   )}' and temp2 is not null and temp2>0 order by temp2 asc`;
+  console.log('hotelCoolingLoadTempInSql->',hotelCoolingLoadTempInSql)
   const hotelCoolingLoadTempInPromise = db.runIotMgmtQuery(
     "m202",
     hotelCoolingLoadTempInSql
@@ -115,6 +129,7 @@ const oneHourScheduler = () => {
     currentDate,
     dateFormat
   )}' and temp1 is not null and temp1>0 order by temp1 asc`;
+  console.log('hotelCoolingLoadTempOutSql->',hotelCoolingLoadTempOutSql)
   const hotelCoolingLoadTempOutPromise = db.runIotMgmtQuery(
     "m202",
     hotelCoolingLoadTempOutSql
@@ -129,6 +144,7 @@ const oneHourScheduler = () => {
     currentDate,
     dateFormat
   )}' and ch1Watt is not null and ch1Watt>0 order by value asc`;
+  console.log('powerDataSql->',powerDataSql)
   const powerDataPromise = db.runIotMgmtQuery("m202", powerDataSql);
 
   // Query here for room_info_table s cooling_per_room for requested room id
@@ -286,87 +302,89 @@ const oneHourScheduler = () => {
             : energyConsumption > 0.4
             ? "Red"
             : "-";
-        const resultedData = {
-          roomNo: room.room_no,
-          roomType: room.room_type,
-          officeCoolingLoad,
-          hotelCoolingLoad,
-          // totalCoolingLoad,
-          coolingRequired,
-          powerDataTotal,
-          plantEfficiency,
-          energyConsumption,
-          startTs: dateFns.format(startDate, dateFormat),
-          endTs: dateFns.format(dateFns.subSeconds(currentDate, 1), dateFormat),
-          dataColor,
-        };
-        resultedArray.push(resultedData);
-        db.saveResultedData(resultedData);
+ //===================================================================== 
+        // const resultedData = {
+        //   roomNo: room.room_no,
+        //   roomType: room.room_type,
+        //   officeCoolingLoad,
+        //   hotelCoolingLoad,
+        //   // totalCoolingLoad,
+        //   coolingRequired,
+        //   powerDataTotal,
+        //   plantEfficiency,
+        //   energyConsumption,
+        //   startTs: dateFns.format(startDate, dateFormat),
+        //   endTs: dateFns.format(dateFns.subSeconds(currentDate, 1), dateFormat),
+        //   dataColor,
+        // };
+        // resultedArray.push(resultedData);
+        //  db.saveResultedData(resultedData);
+  // ===============================================================
   // check nan value before save in database
-        // if (
-        //   isNaN(officeCoolingLoad) &&
-        //   isNaN(hotelCoolingLoad) &&
-        //   // isNaN(cooling_required) &&
-        //   isNaN(powerDataTotal) &&
-        //   isNaN(plantEfficiency) &&
-        //   isNaN(energyConsumption) &&
-        //   room.room_no &&
-        //   // room.room_type &&
-        //   room.room_type != ""
-        // ) {
-        //   console.log('nanblock1-->',isNaN(officeCoolingLoad))
-        //   const sDate = dateFns.subHours(currentDate, 1);
-        //   const date= dateFnsZone.format(sDate, dateFormat, { timeZone: timezone })
-        //   //  const sDate = new Date(2020,3,28)
-        //   //  const date = dateFns.subHours(sDate,1)
-        //   return db
-        //     .getResultedData(date)
-        //     .then((data) => {
-        //       const save = data[0].map((v) => {
-        //         return {
-        //           roomNo: v.roomNo,
-        //           roomType: v.roomType,
-        //           officeCoolingLoad: v.officeCoolingLoad,
-        //           hotelCoolingLoad: v.hotelCoolingLoad,
-        //           coolingRequired: v.coolingRequired,
-        //           powerDataTotal: v.powerDataTotal,
-        //           plantEfficiency: v.plantEfficiency,
-        //           energyConsumption: v.energyConsumption,
-        //           startTs: dateFns.format(startDate, dateFormat),
-        //           // endTs: dateFns.format(dateFns.subSeconds(currentDate, 1), dateFormat),
-        //           dataColor,
-        //         };
-        //       });
-        //       console.log(save,'Return save')
-        //       // return save;
-        //       // resultedArray.push(save);
-        //       db.saveResultedData(save);
-        //     })
-        //     .catch((error) => {
-        //       throw error;
-        //     });
-        // } else {
-        //   // console.log('nanblock2-->',isNaN(officeCoolingLoad))
-        //   const resultedData = {
-        //     roomNo: room.room_no,
-        //     roomType: room.room_type,
-        //     officeCoolingLoad,
-        //     hotelCoolingLoad,
-        //     // totalCoolingLoad,
-        //     coolingRequired,
-        //     powerDataTotal,
-        //     plantEfficiency,
-        //     energyConsumption,
-        //     startTs: dateFns.format(startDate, dateFormat),
-        //     endTs: dateFns.format(
-        //       dateFns.subSeconds(currentDate, 1),
-        //       dateFormat
-        //     ),
-        //     dataColor,
-        //   };
-        //   resultedArray.push(resultedData);
-        //   db.saveResultedData(resultedData);
-        // }
+        if (
+          isNaN(officeCoolingLoad) ||
+          isNaN(hotelCoolingLoad) ||
+          // isNaN(cooling_required) &&
+          isNaN(powerDataTotal) ||
+          isNaN(plantEfficiency) ||
+          isNaN(energyConsumption) 
+        ) {
+          console.log('nanblock1-->', isNaN(officeCoolingLoad), isNaN(hotelCoolingLoad), isNaN(powerDataTotal), isNaN(plantEfficiency), isNaN(energyConsumption))
+          // const sDate = dateFns.subHours(currentDate, 1);
+          // const date= dateFnsZone.format(sDate, dateFormat, { timeZone: timezone })
+          const sDate = dateFns.subHours(currentDate, 1);
+          const date= dateFnsZone.format(sDate, dateFormat, { timeZone: timezone })
+          console.log(date,'<===dateSubtract inNaN1')
+          //  const date = dateFns.subHours(sDate,1)
+          return db
+            .getResultedData(date)
+            .then((data) => {
+              const save = data[0].map((v) => {
+                return {
+                  roomNo: v.roomNo,
+                  roomType: v.roomType,
+                  officeCoolingLoad: v.officeCoolingLoad,
+                  hotelCoolingLoad: v.hotelCoolingLoad,
+                  coolingRequired: v.coolingRequired,
+                  powerDataTotal: v.powerDataTotal,
+                  plantEfficiency: v.plantEfficiency,
+                  energyConsumption: v.energyConsumption,
+                  startTs: dateFns.format(startDate, dateFormat),
+                  dataColor:v.dataColor,
+                };
+              });
+              console.log('Nan result-save :', save.length)
+              // return save;
+               resultedArray.push(save);
+               db.saveResultedData(save);
+            })
+            .catch((error) => {
+              throw error;
+            });
+        } else {
+          // console.log('not NaN')
+          const resultedData = {
+            roomNo: room.room_no,
+            roomType: room.room_type,
+            officeCoolingLoad,
+            hotelCoolingLoad,
+            // totalCoolingLoad,
+            coolingRequired,
+            powerDataTotal,
+            plantEfficiency,
+            energyConsumption,
+            startTs: dateFns.format(startDate, dateFormat),
+            endTs: dateFns.format(
+              dateFns.subSeconds(currentDate, 1),
+              dateFormat
+            ),
+            dataColor,
+          };
+          resultedArray.push(resultedData);
+           db.saveResultedData(resultedData)
+           .then(data => console.log("succes",Object.keys(resultedData).length))
+           .catch(error => console.error("Error save room-info: "+ error.toString()))
+        }
       });
   // each data will be saved in every hour as this method will only called at first second of every hour,// save resultedData as a row in db (historical data purpose)
       return resultedArray;
@@ -481,6 +499,7 @@ const getRoomData = (startDate, endDate, hotel_id, room_id) => {
 
 module.exports = {
   oneHourScheduler,
+  oneHourSchedulerAuto,
   getRoomInfoById,
   getRoomEnergyConsumption,
   getRoomCarbonFootPrint,

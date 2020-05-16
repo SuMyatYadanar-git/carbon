@@ -1,15 +1,14 @@
- const mysql = require("mysql2");
-
+const mysql = require("mysql2");
 
 const con1 = mysql.createConnection({
   host: "localhost",
-  user: "root", 
+  user: "root",
   password: "root",
   database: "carbon_offset_db",
 });
 // const con1 = mysql.createConnection({
 //   host: "localhost",
-//   user: "kumo99", 
+//   user: "kumo99",
 //   password: "root",
 //   database: "carbon_offset_db",
 // });
@@ -19,21 +18,10 @@ const con3 = mysql.createConnection({
   user: "kumo",
   password: "kumo99",
   database: "iotmgmt",
-  //  database : 'iotdata'
-});
-handleDisconnect(con3);
-function handleDisconnect(client) {
-  client.on('error', function (error) {
-    if (!error.fatal) return;
-    // console.log("error myar", error)
-    if (error.code !== 'PROTOCOL_CONNECTION_LOST') throw error;
-    console.error('> Re-connecting lost MySQL connection: ' + error.stack);
-    let mysqlClient = mysql.createConnection(client.config);
-    handleDisconnect(mysqlClient);
-    mysqlClient.connect();
-  });
-};
+  //  database : 'iotdata',
+  trace: true,
 
+});
 const con2 = mysql.createConnection({
   host: "202.73.49.62",
   user: "ecoui",
@@ -41,6 +29,36 @@ const con2 = mysql.createConnection({
   database: "iotmgmt",
   // database : 'iotdata'
 });
+
+const pingAllDBs = () => {
+  con1.query("Select 1")
+  con2.query("Select 1")
+  con3.query("Select 1")
+  console.log("\nFinished ping to all databases.")
+}
+
+handleDisconnect(con3);
+handleDisconnect(con1);
+handleDisconnect(con2);
+
+function handleDisconnect(client) {
+  client.on("error", function (error) {
+    try {
+      console.error("\n> Re-connecting lost MySQL connection: " + client.config.host + " : " + error.code + " : " + error.message );
+      if (!error.fatal) {
+        console.error("not fatal");
+        return;
+      }
+      // if (error.code !== 'PROTOCOL_CONNECTION_LOST')
+      // if(error.code==="ECONNREFUSED") return handleDisconnect(client);
+      let mysqlClient = mysql.createConnection(client.config);
+      handleDisconnect(mysqlClient);
+      return mysqlClient.connect();
+    } catch (errorAgain) {
+      console.error("Error again")
+    }
+  });
+}
 
 // developed by @nayhtet
 // m114 or m202
@@ -55,7 +73,7 @@ const runIotMgmtQuery = (db = "m114", query) => {
 // ====================================================================================================
 // @lucy
 const saveResultedData = (data) => {
- console.log(data,'data save query')
+  // console.log(data, "save resulted query");
   return con1.promise().query(`
       insert into 
         resulted_data(roomNo, coolingRequired, roomType, officeCoolingLoad,hotelCoolingLoad,powerDataTotal,plantEfficiency,energyConsumption,startTs,dataColor) 
@@ -71,21 +89,29 @@ const saveResultedData = (data) => {
           '${data.startTs}',
           '${data.dataColor}')`);
 };
-const getResultedData =(date)=>{
-  console.log(date,'query')
-  return con1.promise().query(`select * from resulted_data where startTs='${date}'`)
-}
-
-// one-hour energy-consumption for room_id,startdate and enddate
-const oneHourEnergyConsumption =(no,startDate,endDate)=>{
-  return con1.promise().query(`SELECT energyConsumption,dataColor,startTs as ts from resulted_data where roomNo=${no} and startTs between '${startDate}' and '${endDate}' `)
-}
-// get hourly room  energyConsumption for carbon-offset old-version
-const hourlyRoomEnergyConsumption = (id, startDate, endDate) => {
-  console.log(id,startDate,endDate)
+const getResultedData = (date) => {
+  console.log(date, "getResulted");
   return con1
     .promise()
-    .query( `SELECT energyConsumption,startTs as ts,roomType from resulted_data where roomNo=${id} and startTs between '${startDate}' and '${endDate}'` );
+    .query(`select * from resulted_data where startTs='${date}'`);
+};
+
+// one-hour energy-consumption for room_id,startdate and enddate
+const oneHourEnergyConsumption = (no, startDate, endDate) => {
+  return con1
+    .promise()
+    .query(
+      `SELECT energyConsumption,dataColor,startTs as ts from resulted_data where roomNo=${no} and startTs between '${startDate}' and '${endDate}' `
+    );
+};
+// get hourly room  energyConsumption for carbon-offset old-version
+const hourlyRoomEnergyConsumption = (id, startDate, endDate) => {
+  console.log(id, startDate, endDate, "carbon");
+  return con1
+    .promise()
+    .query(
+      `SELECT energyConsumption,startTs as ts,roomType from resulted_data where roomNo=${id} and startTs between '${startDate}' and '${endDate}'`
+    );
 };
 // get room info by id
 const getRoomInfoById = (room_id, hotel_id) => {
@@ -135,7 +161,7 @@ const newsLetterMailExist = (email) => {
     .query(`select email from news_letter_tbl where email='${email}'`);
 };
 const postUserFeedback = (hours, room_temp, hotel_temp) => {
-  console.log(hours,room_temp,hotel_temp,'query')
+  console.log(hours, room_temp, hotel_temp, "query");
   return con1
     .promise()
     .query(
@@ -148,7 +174,7 @@ const postUserFeedback = (hours, room_temp, hotel_temp) => {
 module.exports = {
   saveResultedData,
   runIotMgmtQuery,
-   getResultedData,
+  getResultedData,
   getRoomInfo,
   getRoomInfoById,
   // getCoefficientgetCoefficient,
@@ -160,5 +186,5 @@ module.exports = {
   newsLetter,
   newsLetterMailExist,
   postUserFeedback,
- 
+  pingAllDBs,
 };
