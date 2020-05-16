@@ -1,17 +1,17 @@
 const mysql = require("mysql2");
 
-const con1 = mysql.createConnection({
-  host: "localhost",
-  user: "root",
-  password: "root",
-  database: "carbon_offset_db",
-});
 // const con1 = mysql.createConnection({
 //   host: "localhost",
-//   user: "kumo99",
+//   user: "root",
 //   password: "root",
 //   database: "carbon_offset_db",
 // });
+const con1 = mysql.createConnection({
+  host: "localhost",
+  user: "kumo99",
+  password: "root",
+  database: "carbon_offset_db",
+});
 const con3 = mysql.createConnection({
   host: "114.32.125.70",
   port: "33061",
