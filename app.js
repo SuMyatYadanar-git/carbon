@@ -8,7 +8,6 @@ const db = require("./db/carbonoffset_db");
 
 const service = require("./service/roomInfoService");
 const router = require("./route/index");
-const error_code = require("./error.js");
 // const router = require('./route/roomRoute.js')
 
 
@@ -40,7 +39,17 @@ app.get("/one-hour-manual", (req, res) => {
   // const endDate = dateFnsZone.utcToZonedTime(endDateObj, timezone);
   service
     .oneHourScheduler(endDate)
-    .then((data) => res.json(data))
+    .then((data) =>{
+      Promise.all(data)
+        .then(resultedData => {
+          if(resultedData.filter(v => !v).length>0) {
+            res.json({error: "Not Success", error:error.toString()})
+          }
+          else res.json(resultedData)
+        })
+        .catch(error => res.json({error: error.toString()}))
+      
+    })
     .catch((error) => res.status(400).json({ error: error.toString() }));
 });
 

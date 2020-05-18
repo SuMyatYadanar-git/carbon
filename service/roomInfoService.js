@@ -182,7 +182,7 @@ const oneHourScheduler = (currentDate) => {
       //   hotelCoolingLoadTempOut,
       //   powerData,
       // })
-
+      
       const officeCoolingLoadFlowRateMedian =
         officeCoolingLoadFlowRate.length / 2 === 0
           ? officeCoolingLoadFlowRate[
@@ -289,7 +289,11 @@ const oneHourScheduler = (currentDate) => {
       const plantEfficiency = powerDataTotal / totalCoolingLoad; // should be around 0.6 // ask detail about efficiency calculation also coolingLoads
 
       const resultedArray = [];
-      roomInfo.forEach((room) => {
+
+      // roomInfo.forEach((room) =>
+
+      for(let indexx=0; indexx<roomInfo.length; indexx++) {
+        const room = roomInfo[indexx]
         const coolingRequired = room.cooling_required;
 
         const energyConsumption = plantEfficiency * coolingRequired * 1;
@@ -324,51 +328,42 @@ const oneHourScheduler = (currentDate) => {
         if (
           isNaN(officeCoolingLoad) ||
           isNaN(hotelCoolingLoad) ||
-          // isNaN(cooling_required) &&
           isNaN(powerDataTotal) ||
           isNaN(plantEfficiency) ||
           isNaN(energyConsumption) 
         ) {
           console.log('nanblock1-->', isNaN(officeCoolingLoad), isNaN(hotelCoolingLoad), isNaN(powerDataTotal), isNaN(plantEfficiency), isNaN(energyConsumption))
-          // const sDate = dateFns.subHours(currentDate, 1);
-          // const date= dateFnsZone.format(sDate, dateFormat, { timeZone: timezone })
-          const sDate = dateFns.subHours(currentDate, 1);
+          const sDate = dateFns.subHours(currentDate, 2);
           const date= dateFnsZone.format(sDate, dateFormat, { timeZone: timezone })
-          console.log(date,'<===dateSubtract inNaN1')
+          const nowDate =dateFns.format(startDate, dateFormat)
           //  const date = dateFns.subHours(sDate,1)
-          return db
-            .getResultedData(date)
+          const result = db.getResultedData(date, room.room_no)
             .then((data) => {
-              const save = data[0].map((v) => {
-                return {
-                  roomNo: v.roomNo,
-                  roomType: v.roomType,
-                  officeCoolingLoad: v.officeCoolingLoad,
-                  hotelCoolingLoad: v.hotelCoolingLoad,
-                  coolingRequired: v.coolingRequired,
-                  powerDataTotal: v.powerDataTotal,
-                  plantEfficiency: v.plantEfficiency,
-                  energyConsumption: v.energyConsumption,
-                  startTs: dateFns.format(startDate, dateFormat),
-                  dataColor:v.dataColor,
-                };
-              });
-              console.log('Nan result-save :', save.length)
-              // return save;
-               resultedArray.push(save);
-               db.saveResultedData(save);
+                if(data.length===0) return null
+                else {
+                  const result1 = db.saveResultedDataArray(data[0][0],nowDate)
+                    .then(data1 => { 
+                      console.log('Success save with resulted-data with prev hour:',); 
+                      return data1[0]; 
+                    })
+                    .catch(error => {
+                      console.error("Error save resulted-data with prev hour: "+ error.toString()); 
+                      return null; } )
+                    return result1
+                }
+              // }
             })
-            .catch((error) => {
-              throw error;
+            .catch((error) => {// throw error;
+                console.error("Error get resulted-data at prev hour: "+ error.toString()) 
+                return null
             });
+            resultedArray.push(result)
         } else {
-          // console.log('not NaN')
           const resultedData = {
             roomNo: room.room_no,
             roomType: room.room_type,
             officeCoolingLoad,
             hotelCoolingLoad,
-            // totalCoolingLoad,
             coolingRequired,
             powerDataTotal,
             plantEfficiency,
@@ -380,14 +375,21 @@ const oneHourScheduler = (currentDate) => {
             ),
             dataColor,
           };
-          resultedArray.push(resultedData);
-           db.saveResultedData(resultedData)
-           .then(data => console.log("succes",Object.keys(resultedData).length))
-           .catch(error => console.error("Error save room-info: "+ error.toString()))
+          
+          const result = db.saveResultedData(resultedData)
+           .then(data =>{ 
+              console.log("succes",Object.keys(resultedData).length); 
+              return resultedData
+            })
+           .catch(error => {
+            console.error("Error save room-info: "+ error.toString())
+            return null
+           })
+           resultedArray.push(result)
         }
-      });
+      }
   // each data will be saved in every hour as this method will only called at first second of every hour,// save resultedData as a row in db (historical data purpose)
-      return resultedArray;
+     return resultedArray;
     })
     .catch((error) => {
       throw error;
@@ -420,7 +422,7 @@ const getRoomCarbonFootPrint = async (id, startDate, endDate) => {
     })
     .catch((error) => {
       console.log(error, "in carbon footprint calcul");
-      return error;
+      throw error;
     });
 };
 // ====================================================================
@@ -453,7 +455,7 @@ const getRoomInfoById = (room_id, hotel_id) => {
 const getHotelInfoData = () => {
   return db.getHotelInfo();
 };
-// room data not using
+// room data not using currently
 const getRoomData = (startDate, endDate, hotel_id, room_id) => {
   const promise1 = getRoomInfoById(room_id, hotel_id);
   const promise2 = getRoomEnergyConsumption(room_id, startDate, endDate);
@@ -488,7 +490,6 @@ const getRoomData = (startDate, endDate, hotel_id, room_id) => {
       return resultData;
     })
     .catch((error) => {
-      console.log(error);
       return error;
     });
 };

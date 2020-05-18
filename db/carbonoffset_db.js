@@ -75,7 +75,20 @@ const runIotMgmtQuery = async(db = "m114", query) => {
 // ====================================================================================================
 // @lucy
 const saveResultedData = (data) => {
-  // console.log(data, "save resulted query");
+  //  console.log('queryTest==>',`
+  //  insert into 
+  //    resulted_data(roomNo, coolingRequired, roomType, officeCoolingLoad,hotelCoolingLoad,powerDataTotal,plantEfficiency,energyConsumption,startTs,dataColor) 
+  //    values (
+  //      ${data.roomNo},
+  //      ${data.coolingRequired},
+  //      '${data.roomType}',
+  //      ${data.officeCoolingLoad},
+  //      ${data.hotelCoolingLoad},
+  //      ${data.powerDataTotal},
+  //      ${data.plantEfficiency},
+  //      ${data.energyConsumption},
+  //      '${data.startTs}',
+  //      '${data.dataColor}')`)
   return con1.promise().query(`
       insert into 
         resulted_data(roomNo, coolingRequired, roomType, officeCoolingLoad,hotelCoolingLoad,powerDataTotal,plantEfficiency,energyConsumption,startTs,dataColor) 
@@ -91,11 +104,42 @@ const saveResultedData = (data) => {
           '${data.startTs}',
           '${data.dataColor}')`);
 };
-const getResultedData = (date) => {
+// saveResultedDataAraay for previous time
+const saveResultedDataArray=(data,ts)=>{
+  // console.log('queryTest==>',`
+  // insert into 
+  //   resulted_data(roomNo, coolingRequired, roomType, officeCoolingLoad,hotelCoolingLoad,powerDataTotal,plantEfficiency,energyConsumption,startTs,dataColor) 
+  //   values (
+  //     ${data.roomNo},
+  //     ${data.coolingRequired},
+  //     '${data.roomType}',
+  //     ${data.officeCoolingLoad},
+  //     ${data.hotelCoolingLoad},
+  //     ${data.powerDataTotal},
+  //     ${data.plantEfficiency},
+  //     ${data.energyConsumption},
+  //     '${ts}',
+  //     '${data.dataColor}')`)
+    return con1.promise().query(`
+    insert into 
+      resulted_data(roomNo, coolingRequired, roomType, officeCoolingLoad,hotelCoolingLoad,powerDataTotal,plantEfficiency,energyConsumption,startTs,dataColor) 
+      values (
+        ${data.roomNo},
+        ${data.coolingRequired},
+        '${data.roomType}',
+        ${data.officeCoolingLoad},
+        ${data.hotelCoolingLoad},
+        ${data.powerDataTotal},
+        ${data.plantEfficiency},
+        ${data.energyConsumption},
+        '${ts}',
+        '${data.dataColor}')`);  
+}
+const getResultedData = (date, roomNo) => {
    console.log(date, "getResulted");
   return con1
     .promise()
-    .query(`select * from resulted_data where startTs='${date}'`);
+    .query(`select * from resulted_data where startTs='${date}' and roomNo=${roomNo}`);
 };
 
 // one-hour energy-consumption for room_id,startdate and enddate
@@ -127,10 +171,6 @@ const getRoomInfo = () => {
   return con1.promise().query(`select * from room_info`);
 };
 
-//get coefficient
-// const getCoefficient = () => {
-//   return con1.promise().query(`select * from coefficient`);
-// };
 // get hotel-info
 const getHotelInfo = () => {
   return con1.promise().query(`select * from hotel_info`);
@@ -151,6 +191,13 @@ const postGuestDetail = (
       [firstName, lastName, roomNumber, checkInDate, checkOutDate]
     );
 };
+// get guest-info
+const getGuestInfoWithRoomNo = (roomNo,guestId)=>{
+  return con1.promise()
+  .query(`select concat(guest.first_name,' ',guest.last_name) AS fullName,date_format(guest.checkin_datetime,'%Y-%m-%d %H:%i:%s  %p') as checkin,date_format(guest.checkout_datetime,'%Y-%m-%d %H:%i:%s  %p') as checkout,guest.room_no as roomNo,room.room_type from carbon_offset_db.guest_info as guest
+  left join carbon_offset_db.room_info as room  on guest.room_no = room.room_no
+  where room.room_no=${roomNo} and guest.guest_id=${guestId}`)
+}
 
 const newsLetter = (email) => {
   return con1
@@ -175,6 +222,7 @@ const postUserFeedback = (hours, room_temp, hotel_temp) => {
 
 module.exports = {
   saveResultedData,
+  saveResultedDataArray,
   runIotMgmtQuery,
   getResultedData,
   getRoomInfo,
@@ -185,6 +233,7 @@ module.exports = {
   getHotelInfo,
   // guest
   postGuestDetail,
+  getGuestInfoWithRoomNo,
   newsLetter,
   newsLetterMailExist,
   postUserFeedback,

@@ -3,7 +3,7 @@ const { sub, set, add, parseISO, format, isBefore } = require("date-fns");
 const dateFns = require("date-fns");
 const dateFnsZone = require("date-fns-tz");
 const {  validationResult } = require('express-validator');
-const {postGuestDetailService,newsLetterService,getNewsletter,postUserFeedbackService} =require('../service/guestService')
+const {postGuestDetailService,getGuestService,newsLetterService,getNewsletter,postUserFeedbackService} =require('../service/guestService')
 
 
 const postGuestDetail =(req,res)=>{
@@ -41,6 +41,24 @@ const postGuestDetail =(req,res)=>{
 			}
 	})
 }
+// get Guest-info at roomNo
+const getGuestInfo=(req,res)=>{
+	const roomNo = req.query.roomNo
+	const guestId = req.query.guestId
+	return getGuestService(roomNo,guestId)
+	.then(data => {
+		return  res.status(200).json({success:true,payload:data[0],error:null})
+	})
+	.catch(error=>{
+		console.log('Error getGuest',error.toString())
+		return  res.status(503).json({
+			success:false,
+			error:-1008
+		})	
+	})
+
+}
+
 
 const newsLetter=async(req,res)=>{
 	const errors = validationResult(req)
@@ -70,7 +88,7 @@ const newsLetter=async(req,res)=>{
 					error:-1004,
 				})
 			}else{
-				console.log(error,'news_letter')
+				console.log(err,'news_letter')
 				return  res.status(503).json({
 						// error:error_code["-1008"],
 						success:false,
@@ -121,4 +139,4 @@ const newsLetter=async(req,res)=>{
 	}
 
 
-module.exports = {postGuestDetail,newsLetter,postUserFeedback};
+module.exports = {postGuestDetail,getGuestInfo,newsLetter,postUserFeedback};
