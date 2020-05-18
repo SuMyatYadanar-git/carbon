@@ -59,7 +59,7 @@ const oneHourScheduler = (currentDate) => {
     currentDate,
     dateFormat
   )}' and flowRate is not null and flowRate>0 order by flowRate asc`;
-  console.log('officeflowRateSQL->',officeCoolingLoadFlowRateSql)
+  // console.log('officeflowRateSQL->',officeCoolingLoadFlowRateSql)
   const officeCoolingLoadFlowRatePromise = db.runIotMgmtQuery(
     "m202",
     officeCoolingLoadFlowRateSql
@@ -73,7 +73,7 @@ const oneHourScheduler = (currentDate) => {
     currentDate,
     dateFormat
   )}' and temp1 is not null and temp1>0 order by temp1 asc`;
-  console.log('officeCoolingLoadTempInSql->',officeCoolingLoadTempInSql)
+  // console.log('officeCoolingLoadTempInSql->',officeCoolingLoadTempInSql)
   const officeCoolingLoadTempInPromise = db.runIotMgmtQuery(
     "m114",
     officeCoolingLoadTempInSql
@@ -101,7 +101,7 @@ const oneHourScheduler = (currentDate) => {
     currentDate,
     dateFormat
   )}' and flowRate is not null and flowRate>0 order by flowRate asc`;
-  console.log('hotelCoolingLoadFlowRateSql->',hotelCoolingLoadFlowRateSql)
+  // console.log('hotelCoolingLoadFlowRateSql->',hotelCoolingLoadFlowRateSql)
   const hotelCoolingLoadFlowRatePromise = db.runIotMgmtQuery(
     "m202",
     hotelCoolingLoadFlowRateSql
@@ -115,7 +115,7 @@ const oneHourScheduler = (currentDate) => {
     currentDate,
     dateFormat
   )}' and temp2 is not null and temp2>0 order by temp2 asc`;
-  console.log('hotelCoolingLoadTempInSql->',hotelCoolingLoadTempInSql)
+  // console.log('hotelCoolingLoadTempInSql->',hotelCoolingLoadTempInSql)
   const hotelCoolingLoadTempInPromise = db.runIotMgmtQuery(
     "m202",
     hotelCoolingLoadTempInSql
@@ -129,7 +129,7 @@ const oneHourScheduler = (currentDate) => {
     currentDate,
     dateFormat
   )}' and temp1 is not null and temp1>0 order by temp1 asc`;
-  console.log('hotelCoolingLoadTempOutSql->',hotelCoolingLoadTempOutSql)
+  // console.log('hotelCoolingLoadTempOutSql->',hotelCoolingLoadTempOutSql)
   const hotelCoolingLoadTempOutPromise = db.runIotMgmtQuery(
     "m202",
     hotelCoolingLoadTempOutSql
@@ -144,7 +144,7 @@ const oneHourScheduler = (currentDate) => {
     currentDate,
     dateFormat
   )}' and ch1Watt is not null and ch1Watt>0 order by value asc`;
-  console.log('powerDataSql->',powerDataSql)
+  // console.log('powerDataSql->',powerDataSql)
   const powerDataPromise = db.runIotMgmtQuery("m202", powerDataSql);
 
   // Query here for room_info_table s cooling_per_room for requested room id
@@ -448,10 +448,6 @@ const getRoomInfo = () => {
 // get room info by id
 const getRoomInfoById = (room_id, hotel_id) => {
   return db.getRoomInfoById(room_id, hotel_id);
-};
-
-const getMedianEfficiency = (ts) => {
-  return db.getEFficiencyMedian(ts);
 };
 // get hotel-info service
 const getHotelInfoData = () => {

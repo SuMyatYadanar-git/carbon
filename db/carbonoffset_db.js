@@ -20,7 +20,6 @@ const con3 = mysql.createConnection({
   database: "iotmgmt",
   //  database : 'iotdata',
   trace: true,
-
 });
 const con2 = mysql.createConnection({
   host: "202.73.49.62",
@@ -90,7 +89,7 @@ const saveResultedData = (data) => {
           '${data.dataColor}')`);
 };
 const getResultedData = (date) => {
-  console.log(date, "getResulted");
+   console.log(date, "getResulted");
   return con1
     .promise()
     .query(`select * from resulted_data where startTs='${date}'`);
@@ -106,7 +105,7 @@ const oneHourEnergyConsumption = (no, startDate, endDate) => {
 };
 // get hourly room  energyConsumption for carbon-offset old-version
 const hourlyRoomEnergyConsumption = (id, startDate, endDate) => {
-  console.log(id, startDate, endDate, "carbon");
+   console.log(id, startDate, endDate, "carbon");
   return con1
     .promise()
     .query(
