@@ -6,7 +6,8 @@ const error_code={
         "-1005":"Invalid req format",
         "-1006":"Input already exists",
         "-1007":"Calculation error",
-        "-1008":"Service unavailable"
+        "-1008":"Service unavailable",
+        "-1009":"Connection closed"
 }
 // 409 conflict
  module.exports = error_code

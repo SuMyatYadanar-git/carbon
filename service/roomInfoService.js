@@ -442,7 +442,7 @@ const getRoomInfo = () => {
     })
     .catch((error) => {
       console.log(error, "in get roominfo");
-      return error;
+      return {error:'-1009'};
     });
 };
 // get room info by id
