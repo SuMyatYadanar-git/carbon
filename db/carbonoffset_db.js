@@ -32,10 +32,33 @@ const con2 = mysql.createPool({
   // database : 'iotdata'
 });
 
+
+const con4 = mysql.createPool({
+  host: "114.32.125.70",
+  port: "33061",
+  user: "kumo",
+  password: "kumo99",
+  database: "iotdata",
+  waitForConnections: true,
+  connectTimeout:30000,
+  //  database : 'iotdata',
+  trace: true,
+});
+const con5 = mysql.createPool({
+  host: "202.73.49.62",
+  user: "ecoui",
+  password: "ECO4ui17",
+  database: "iotdata",
+  waitForConnections: true,
+  // database : 'iotdata'
+});
+
 const pingAllDBs = () => {
   con1.query("Select 1")
   con2.query("Select 1")
   con3.query("Select 1")
+  con4.query("Select 1")
+  con5.query("Select 1")
   console.log("\nFinished ping to all databases.")
 }
 
@@ -66,10 +89,10 @@ function handleDisconnect(client) {
 // m114 or m202
 const runIotMgmtQuery = async(db = "m114", query) => {
   if (db === "m114") {
-    return await con3.promise().query(query);
+    return await isPrev?con4.promise().query(query):con3.promise().query(query);;
   } else {
     // suppose m202
-    return await con2.promise().query(query);
+    return await isPrev?con5.promise().query(query):con2.promise().query(query);;
   }
 };
 // ====================================================================================================
@@ -218,6 +241,14 @@ const postUserFeedback = (hours, room_temp, hotel_temp) => {
       [hours, room_temp, hotel_temp]
     );
 };
+
+const getLastTimeData = (query) => {
+  console.log(query);
+  return con1
+    .promise()
+    .query(query);
+}
+
 // ====================================================================================================================================================================
 
 module.exports = {
@@ -238,4 +269,5 @@ module.exports = {
   newsLetterMailExist,
   postUserFeedback,
   pingAllDBs,
+  getLastTimeData
 };
