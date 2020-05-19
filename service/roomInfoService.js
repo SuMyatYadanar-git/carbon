@@ -14,7 +14,38 @@ const oneHourSchedulerAuto = () => {
   const cDate = dateFnsZone.utcToZonedTime(new Date(), timezone);
   const currentDate = dateFns.setSeconds(dateFns.setMinutes(cDate, 0), 0); // HH:00:00
 
-  oneHourScheduler(currentDate)
+  //htookyaw add this
+  const lastTimeSql = "select max(startTs) as startTs from resulted_data ";
+  const lastTimePromise = db.getLastTimeData(lastTimeSql);
+  return Promise.all([lastTimePromise]).then((values) => {
+
+    const dateFormat = "yyyy-MM-dd HH:mm:ss";
+    const ts = values[0][0].map(d => d.startTs);
+
+
+    let dbStartDate = dateFnsZone.utcToZonedTime(new Date(ts), timezone);
+    let dbStartTs = dateFns.setSeconds(dateFns.setMinutes(dbStartDate, 0), 0);
+
+    let curDate = dateFnsZone.utcToZonedTime(new Date(), timezone);
+    let curTs = dateFns.setSeconds(dateFns.setMinutes(curDate, 0), 0); // HH:00:00
+    console.log("previous date", dbStartTs, "current timestamp ", dateFns.subHours(curTs, 1))
+    if (dateFns.isAfter(dateFns.subHours(curTs, 1), dbStartTs)) { //dateFns.subHours(curTs, 1) > dbStartTs
+
+      while (dateFns.isAfter(dateFns.subHours(curTs, 1), dbStartTs)) {
+
+        curDate = dateFnsZone.utcToZonedTime(new Date(), timezone);
+        curTs = dateFns.setSeconds(dateFns.setMinutes(curDate, 0), 0);
+        dbStartTs = dateFns.addHours(dbStartTs, 1);
+        oneHourScheduler(dbStartTs);
+
+        console.log(dateFnsZone.format(curTs, dateFormat, { timeZone: timezone }), "start db", dateFnsZone.format(dbStartTs, dateFormat, { timeZone: timezone }))
+      }
+
+    }
+    else {
+      oneHourScheduler(currentDate);
+    }
+  })
 }
 
 // developed by @nayhtet
@@ -32,6 +63,12 @@ const oneHourScheduler = (currentDate) => {
     "currentDate: ",
     dateFnsZone.format(currentDate, dateFormat, { timeZone: timezone })
   );
+
+  
+  //@htookyaw 
+  const todayDate = dateFnsZone.utcToZonedTime(new Date(), timezone);
+  const todayTs = dateFns.setSeconds(dateFns.setMinutes(todayDate, 0), 0);
+  const isPrev = dateFns.differenceInDays(todayTs,startDate)>1;
 
   const power202 = [
     "ppssbms0013",
@@ -62,7 +99,8 @@ const oneHourScheduler = (currentDate) => {
   // console.log('officeflowRateSQL->',officeCoolingLoadFlowRateSql)
   const officeCoolingLoadFlowRatePromise = db.runIotMgmtQuery(
     "m202",
-    officeCoolingLoadFlowRateSql
+    officeCoolingLoadFlowRateSql,
+    isPrev
   );
   const officeCoolingLoadTempInSql = `select temp1 as value, ts from dTemperature where ieee in ('${
     temp114[1]
@@ -76,7 +114,8 @@ const oneHourScheduler = (currentDate) => {
   // console.log('officeCoolingLoadTempInSql->',officeCoolingLoadTempInSql)
   const officeCoolingLoadTempInPromise = db.runIotMgmtQuery(
     "m114",
-    officeCoolingLoadTempInSql
+    officeCoolingLoadTempInSql,
+    isPrev
   );
   const officeCoolingLoadTempOutSql = `select temp1 as value, ts from dTemperature where ieee in ('${
     temp114[0]
@@ -89,7 +128,8 @@ const oneHourScheduler = (currentDate) => {
   )}' and temp1 is not null and temp1>0 order by temp1 asc`;
   const officeCoolingLoadTempOutPromise = db.runIotMgmtQuery(
     "m114",
-    officeCoolingLoadTempOutSql
+    officeCoolingLoadTempOutSql,
+    isPrev
   );
   // hotel cooling
   const hotelCoolingLoadFlowRateSql = `select flowRate as value, ts from ultrasonicFlow2 where ieee in ('${
@@ -104,7 +144,8 @@ const oneHourScheduler = (currentDate) => {
   // console.log('hotelCoolingLoadFlowRateSql->',hotelCoolingLoadFlowRateSql)
   const hotelCoolingLoadFlowRatePromise = db.runIotMgmtQuery(
     "m202",
-    hotelCoolingLoadFlowRateSql
+    hotelCoolingLoadFlowRateSql,
+    isPrev
   );
   const hotelCoolingLoadTempInSql = `select temp2 as value, ts from dTemperature where ieee in ('${
     temp202[0]
@@ -118,7 +159,8 @@ const oneHourScheduler = (currentDate) => {
   // console.log('hotelCoolingLoadTempInSql->',hotelCoolingLoadTempInSql)
   const hotelCoolingLoadTempInPromise = db.runIotMgmtQuery(
     "m202",
-    hotelCoolingLoadTempInSql
+    hotelCoolingLoadTempInSql,
+    isPrev
   );
   const hotelCoolingLoadTempOutSql = `select temp1 as value, ts from dTemperature where ieee in ('${
     temp202[0]
@@ -132,7 +174,8 @@ const oneHourScheduler = (currentDate) => {
   // console.log('hotelCoolingLoadTempOutSql->',hotelCoolingLoadTempOutSql)
   const hotelCoolingLoadTempOutPromise = db.runIotMgmtQuery(
     "m202",
-    hotelCoolingLoadTempOutSql
+    hotelCoolingLoadTempOutSql,
+    isPrev
   );
 
   const powerDataSql = `select ch1Watt as value, ieee, ts from pm where ieee in (${getCommaSeparatedString(
@@ -145,7 +188,7 @@ const oneHourScheduler = (currentDate) => {
     dateFormat
   )}' and ch1Watt is not null and ch1Watt>0 order by value asc`;
   // console.log('powerDataSql->',powerDataSql)
-  const powerDataPromise = db.runIotMgmtQuery("m202", powerDataSql);
+  const powerDataPromise = db.runIotMgmtQuery("m202", powerDataSql,isPrev);
 
   // Query here for room_info_table s cooling_per_room for requested room id
   const roomInfoPromise = getRoomInfo();
