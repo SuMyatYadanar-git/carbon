@@ -9,7 +9,7 @@ const mysql = require("mysql2");
 // });
 const con1 = mysql.createConnection({
   host: "localhost",
-  user: "kumo99",
+  user: "user125",
   password: "root",
   database: "carbon_offset_db",
 });
@@ -87,7 +87,7 @@ function handleDisconnect(client) {
 
 // developed by @nayhtet
 // m114 or m202
-const runIotMgmtQuery = async(db = "m114", query) => {
+const runIotMgmtQuery = async(db = "m114", query,isPrev) => {
   if (db === "m114") {
     return await isPrev?con4.promise().query(query):con3.promise().query(query);;
   } else {
