@@ -68,7 +68,7 @@ const oneHourScheduler = (currentDate) => {
   //@htookyaw 
   const todayDate = dateFnsZone.utcToZonedTime(new Date(), timezone);
   const todayTs = dateFns.setSeconds(dateFns.setMinutes(todayDate, 0), 0);
-  const isPrev = dateFns.differenceInDays(todayTs,startDate)>1;
+  const isPrev = dateFns.differenceInDays(startDate,todayTs)>1;
 
   const power202 = [
     "ppssbms0013",
