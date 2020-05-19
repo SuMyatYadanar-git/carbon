@@ -8,6 +8,9 @@ const postGuestDetailService = (firstName,lastName,roomNumber,checkInDate,checkO
 const getGuestService =(roomNo,guestId)=>{
 	return db.getGuestInfoWithRoomNo(roomNo,guestId)
 }
+const getGuestInfoDataService =()=>{
+	return db.guestExits()
+}
 
 // post newsletter email
 const newsLetterService=(email)=>{
@@ -17,8 +20,8 @@ const getNewsletter = (email)=>{
 	return db.newsLetterMailExist(email)
 }
 // post user-feedback
-const postUserFeedbackService =(hours,room_temp,hotel_temp)=>{
-	return db.postUserFeedback(hours,room_temp,hotel_temp)
+const postUserFeedbackService =(hours,room_temp,hotel_temp,guestId)=>{
+	return db.postUserFeedback(hours,room_temp,hotel_temp,guestId)
 }
 
-module.exports = {postGuestDetailService,getGuestService,newsLetterService,getNewsletter,postUserFeedbackService}
+module.exports = {postGuestDetailService,getGuestService,newsLetterService,getNewsletter,postUserFeedbackService,getGuestInfoDataService}
