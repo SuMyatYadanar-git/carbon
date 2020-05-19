@@ -20,6 +20,7 @@ const con3 = mysql.createPool({
   password: "kumo99",
   database: "iotmgmt",
   waitForConnections: true,
+  connectTimeout:30000,
   //  database : 'iotdata',
   trace: true,
 });
