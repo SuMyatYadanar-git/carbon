@@ -2,8 +2,8 @@ const mysql = require("mysql2");
 // mysql.createConnection
 const con1 = mysql.createPool({
   host: "localhost",
-  user: "root",
-  // user: "user125",
+   user: "root",
+  //  user: "user125",
   password: "root",
   database: "carbon_offset_db",
   waitForConnections: true,
@@ -21,6 +21,7 @@ const con3 = mysql.createPool({
   password: "kumo99",
   database: "iotmgmt",
   waitForConnections: true,
+  connectTimeout:30000,
   //  database : 'iotdata',
   trace: true,
 });
