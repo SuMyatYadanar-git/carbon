@@ -3,6 +3,7 @@ const mysql = require("mysql2");
 const con1 = mysql.createPool({
   host: "localhost",
   user: "root",
+  // user: "user125",
   password: "root",
   database: "carbon_offset_db",
   waitForConnections: true,
@@ -87,7 +88,7 @@ function handleDisconnect(client) {
 
 // developed by @nayhtet
 // m114 or m202
-const runIotMgmtQuery = async(db = "m114", query) => {
+const runIotMgmtQuery = async(db = "m114", query,isPrev) => {
   if (db === "m114") {
     return await isPrev?con4.promise().query(query):con3.promise().query(query);;
   } else {
@@ -217,7 +218,7 @@ const postGuestDetail = (
 // get guest-info
 const getGuestInfoWithRoomNo = (roomNo,guestId)=>{
   return con1.promise()
-  .query(`select concat(guest.first_name,' ',guest.last_name) AS fullName,date_format(guest.checkin_datetime,'%Y-%m-%d %H:%i:%s  %p') as checkin,date_format(guest.checkout_datetime,'%Y-%m-%d %H:%i:%s  %p') as checkout,guest.room_no as roomNo,room.room_type from carbon_offset_db.guest_info as guest
+  .query(`select concat(guest.first_name,' ',guest.last_name) AS fullName,date_format(guest.checkin_datetime,'%Y-%m-%d %H:%i:%s  %p') as checkIn,date_format(guest.checkout_datetime,'%Y-%m-%d %H:%i:%s  %p') as checkOut,guest.room_no as roomNo,room.room_type as roomType from carbon_offset_db.guest_info as guest
   left join carbon_offset_db.room_info as room  on guest.room_no = room.room_no
   where room.room_no=${roomNo} and guest.guest_id=${guestId}`)
 }

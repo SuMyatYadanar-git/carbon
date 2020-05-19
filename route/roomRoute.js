@@ -1,7 +1,6 @@
 const express = require('express')
 const router = express.Router()
 const roomInfoController = require('../controller/roomInfoController')
-const guestDetailController = require('../controller/guestDetailController')
 
 // http://localhost:5000/reports/room_data/room_info?room_no=301&hotel_id=1
 // http://sample.evercomm.com/reports/room_data/room_info/?room_no=301&hotel_id=1

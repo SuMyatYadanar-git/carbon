@@ -1,4 +1,4 @@
-const response =({payload = [], message = null, success = true, error = null})=>{
-    return ({ payload, message, success, error })
+const response =({success = true,payload = [],error = null, message = null })=>{
+    return ({ success,payload,error, message })
 }
 module.exports = response;

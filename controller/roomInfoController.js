@@ -1,6 +1,6 @@
 const roomInfoService=require('../service/roomInfoService')
 const {sub,set,add,parseISO,format,isBefore}  = require('date-fns')
-const error_code = require('../error')
+const error_code = require('../config/error')
 const response = require('../config/response')
 
 //api for get room info by id
@@ -14,7 +14,7 @@ const getRoomInfoById=(req,res)=>{
           error:null,
       })
     }).catch(error=>{
-        if(error.errno == 1054 ){
+        if(error.errno == 1054  ){
             return res.status(400).json({
                 // error:error_code["-1004"],
                 success:false,
