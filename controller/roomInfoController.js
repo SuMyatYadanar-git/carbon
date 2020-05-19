@@ -1,6 +1,7 @@
 const roomInfoService=require('../service/roomInfoService')
 const {sub,set,add,parseISO,format,isBefore}  = require('date-fns')
 const error_code = require('../error')
+const response = require('../config/response')
 
 //api for get room info by id
 const getRoomInfoById=(req,res)=>{

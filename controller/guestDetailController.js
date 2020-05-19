@@ -4,6 +4,7 @@ const dateFns = require("date-fns");
 const dateFnsZone = require("date-fns-tz");
 const {  validationResult } = require('express-validator');
 const {postGuestDetailService,getGuestService,newsLetterService,getNewsletter,postUserFeedbackService} =require('../service/guestService')
+const response = require('../config/response')
 
 
 const postGuestDetail =(req,res)=>{

@@ -7,7 +7,9 @@ const error_code={
         "-1006":"Input already exists",
         "-1007":"Calculation error",
         "-1008":"Service unavailable",
-        "-1009":"Connection closed"
+        "-1009":"Connection closed",
+        "-1010":"DB connection lost",
+        "-1011":"No Raw Data(NAN)",
 }
 // 409 conflict
  module.exports = error_code

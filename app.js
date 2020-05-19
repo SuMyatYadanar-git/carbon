@@ -63,9 +63,12 @@ const job1 = new CronJob("0 0 */1 * * *", service.oneHourSchedulerAuto);
 app.listen(port, (err) => {
   if (err) {
     console.log("server not responding", err);
-  } else console.log(`server up and running at http://localhost:${port} at ${format(new Date(), 'yyyy-MM-dd HH:mm:ss')}`);
-  job0.start(); 
-  job1.start();
+  } else{
+    console.log(`server up and running at http://localhost:${port} at ${format(new Date(), 'yyyy-MM-dd HH:mm:ss')}`);
+    job0.start(); 
+    job1.start();
+  }
+
 });
 
 
