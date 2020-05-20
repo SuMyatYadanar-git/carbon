@@ -141,7 +141,6 @@ const newsLetter = async (req, res) => {
 };
 
 const postUserFeedback = (req, res) => {
-  // console.log('hello feedback',req.body.hours)
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
     return res.status(422).json(
@@ -152,11 +151,13 @@ const postUserFeedback = (req, res) => {
       })
     );
   }
-  
-  const hours =req.body.hours
+  // format(new Date(req.body.hours), "yyyy-MM-dd HH:mm:ss");
+  //  const hours = req.body.hours
+  const hours = format(new Date(req.body.hours), "yyyy-MM-dd HH:mm:ss")
   const room_temp = req.body.room_temp_level;
   const hotel_temp = req.body.hotel_temp_level;
   const guestId = req.body.guest_id;
+  // console.log('format hours:',format(new Date(req.body.hours), "yyyy-MM-dd HH:mm:ss"))
   return postUserFeedbackService(hours, room_temp, hotel_temp,guestId)
     .then((data) => {
       return res.status(202).json(
