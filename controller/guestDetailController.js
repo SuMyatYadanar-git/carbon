@@ -11,6 +11,7 @@ const {
   getGuestInfoDataService,
 } = require("../service/guestService");
 const response = require("../config/response");
+const msgInfo = require("../config/msg");
 
 const postGuestDetail =async (req, res) => {
   const errors = validationResult(req);
@@ -68,6 +69,7 @@ if (filter.length === 0){
   return res.status(409).json(
         response({
           success: false,
+          message:msgInfo.message.error[-1006],
           error: "-1006",
         })
       );
@@ -115,17 +117,16 @@ const newsLetter = async (req, res) => {
       .then((data) => {
         return res.status(202).json(
           response({
-            message: `Guest info inserted successfully`,
+            message: `Email inserted successfully`,
           })
         );
       })
       .catch((error) => {
         return res.status(400).json(
           response({
-            success: false,
+            success: false,     
             message: error.code,
-            error:
-              error.errno == 1054 || error.errno == 1064 ? "-1004" : "-1008",
+            error: error.errno == 1054 || error.errno == 1064 ? "-1004" : "-1008",
           })
         );
       });
@@ -133,7 +134,7 @@ const newsLetter = async (req, res) => {
     return res.status(409).json(
       response({
         success: false,
-        message: error.code,
+        message:msgInfo.message.error[-1006],
         error: "-1006",
       })
     );
