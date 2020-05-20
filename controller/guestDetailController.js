@@ -2,6 +2,7 @@ const { sub, set, add, parseISO, format, isBefore } = require("date-fns");
 const dateFns = require("date-fns");
 const dateFnsZone = require("date-fns-tz");
 const { validationResult } = require("express-validator");
+const error_code = require("../config/error");
 const {
   postGuestDetailService,
   getGuestService,
@@ -13,7 +14,7 @@ const {
 const response = require("../config/response");
 const msgInfo = require("../config/msg");
 
-const postGuestDetail =async (req, res) => {
+const postGuestDetail = async (req, res) => {
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
     return res.status(422).json(
@@ -27,58 +28,68 @@ const postGuestDetail =async (req, res) => {
   const firstName = req.body.firstName;
   const lastName = req.body.lastName;
   const roomNumber = req.body.roomNumber;
-  const checkInDate =format(new Date(req.body.checkIn), "yyyy-MM-dd HH:mm:ss");
-  const checkOutDate =format(new Date(req.body.checkOut), "yyyy-MM-dd HH:mm:ss")  //Date.parse(req.body.checkOut) 
+  const checkInDate = format(new Date(req.body.checkIn), "yyyy-MM-dd HH:mm:ss");
+  const checkOutDate = format(new Date(req.body.checkOut), "yyyy-MM-dd HH:mm:ss")  //Date.parse(req.body.checkOut) 
   // // format(
   //   new Date(req.body.checkOut),
   //   "yyyy-MM-dd HH:mm:ss"
   // );
   const checkGuestInfo = await getGuestInfoDataService()
-  const filter = checkGuestInfo[0].filter((v)=>{
-    return v.first_name == firstName && 
-    v.last_name == lastName && 
-    v.room_no == roomNumber &&
-    dateFns.compareAsc( Date.parse(req.body.checkIn), Date.parse(v.checkin_datetime))===0 && 
-    dateFns.compareAsc( Date.parse(req.body.checkOut), Date.parse(v.checkout_datetime))===0
+  const filter = checkGuestInfo[0].filter((v) => {
+    return v.first_name == firstName &&
+      v.last_name == lastName &&
+      v.room_no == roomNumber &&
+      dateFns.compareAsc(Date.parse(req.body.checkIn), Date.parse(v.checkin_datetime)) === 0 &&
+      dateFns.compareAsc(Date.parse(req.body.checkOut), Date.parse(v.checkout_datetime)) === 0
   })
-if (filter.length === 0){
-  return postGuestDetailService(
-    firstName,
-    lastName,
-    roomNumber,
-    checkInDate,
-    checkOutDate
-  )
-    .then((data) => {
-      return res.status(201).json(
-        response({
-          message: `Guest info inserted successfully`,
-        })
-      );
-    })
-    .catch((error) => {
-      return res.status(400).json(
-        response({
-          success: false,
-          message: error,
-          error: error.errno == 1054 || error.errno == 1064 ? "-1004" : "-1008",
-        })
-      );
-    });
-}else{
-  return res.status(409).json(
-        response({
-          success: false,
-          message:msgInfo.message.error[-1006],
-          error: "-1006",
-        })
-      );
-}
+  if (filter.length === 0) {
+    return postGuestDetailService(
+      firstName,
+      lastName,
+      roomNumber,
+      checkInDate,
+      checkOutDate
+    )
+      .then((data) => {
+        return res.status(201).json(
+          response({
+            message: `Guest info inserted successfully`,
+          })
+        );
+      })
+      .catch((error) => {
+        return res.status(400).json(
+          response({
+            success: false,
+            message: error,
+            error: error.errno == 1054 || error.errno == 1064 ? "-1004" : "-1008",
+          })
+        );
+      });
+  } else {
+    return res.status(409).json(
+      response({
+        success: false,
+        message: msgInfo.message.error[-1006],
+        error: "-1006",
+      })
+    );
+  }
 };
 // get Guest-info at roomNo
 const getGuestInfo = (req, res) => {
   const roomNo = req.query.room_no;
   const guestId = req.query.guest_id;
+
+  console.log("rommnO",roomNo,"guestId",guestId)
+
+  if (!roomNo || !guestId) {
+    return res.status(400).json(response({
+      success: false,
+      error: -1004,
+      message: error_code[-1004]
+    }))
+  }
   return getGuestService(roomNo, guestId)
     .then((data) => {
       return res
@@ -124,7 +135,7 @@ const newsLetter = async (req, res) => {
       .catch((error) => {
         return res.status(400).json(
           response({
-            success: false,     
+            success: false,
             message: error.code,
             error: error.errno == 1054 || error.errno == 1064 ? "-1004" : "-1008",
           })
@@ -134,7 +145,7 @@ const newsLetter = async (req, res) => {
     return res.status(409).json(
       response({
         success: false,
-        message:msgInfo.message.error[-1006],
+        message: msgInfo.message.error[-1006],
         error: "-1006",
       })
     );
@@ -159,7 +170,7 @@ const postUserFeedback = (req, res) => {
   const hotel_temp = req.body.hotel_temp_level;
   const guestId = req.body.guest_id;
   // console.log('format hours:',format(new Date(req.body.hours), "yyyy-MM-dd HH:mm:ss"))
-  return postUserFeedbackService(hours, room_temp, hotel_temp,guestId)
+  return postUserFeedbackService(hours, room_temp, hotel_temp, guestId)
     .then((data) => {
       return res.status(202).json(
         response({
