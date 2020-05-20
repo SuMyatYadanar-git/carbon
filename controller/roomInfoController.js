@@ -2,6 +2,7 @@ const roomInfoService = require('../service/roomInfoService')
 const { sub, set, add, parseISO, format, isBefore } = require('date-fns')
 const response = require("../config/response");
 const error_code = require("../config/error");
+const dateFns = require("date-fns");
 
 //api for get room info by id
 const getRoomInfoById = (req, res) => {
@@ -52,9 +53,16 @@ const getRoomEnergyConsumption = (req, res) => {
             message: error_code[-1004]
         }))
     }
+    else if(!dateFns.isValid(new Date(startDate)) || !dateFns.isValid(new Date(endDate))){
+        return res.status(400).json(response({
+            success: false,
+            error: -1013,
+            message: error_code[-1013]
+        }))
+    }
     try {
         return roomInfoService.getRoomEnergyConsumption(no, startDate, endDate).then(data => {
-            return res.json({
+            return res.json(response({
                 success: true,
                 payload: data[0].map(v => {
                     return ({
@@ -62,9 +70,8 @@ const getRoomEnergyConsumption = (req, res) => {
                         kWh: v.energyConsumption.toFixed(3) ,
                         dataColor: v.dataColor,
                     })
-                }),
-                error: null,
-            })
+                })
+            }))
         }).catch(error => {
             return res.status(500).json(response({
                 success: false,
@@ -95,7 +102,13 @@ const getRoomCarbonFootPrint = (req, res) => {
             message: error_code[-1004]
         }))
     }
-
+    else if(!dateFns.isValid(new Date(startDate)) || !dateFns.isValid(new Date(endDate))){
+        return res.status(400).json(response({
+            success: false,
+            error: -1013,
+            message: error_code[-1013]
+        }))
+    }
     try {
         return roomInfoService.getRoomCarbonFootPrint(id, startDate, endDate).then(data => {
             return res.json(response({
@@ -134,15 +147,22 @@ const getRoomData = (req, res) => {
             message: error_code[-1004]
         }))
     }
+    else if(!dateFns.isValid(new Date(startDate)) || !dateFns.isValid(new Date(endDate))){
+        return res.status(400).json(response({
+            success: false,
+            error: -1013,
+            message: error_code[-1013]
+        }))
+    }
     try {
         return roomInfoService.getRoomData(startDate, endDate, hotel_id, room_id).then(data => {
-            return res.json({
+            return res.json(response({
                 success: true,
                 hotel_id: data.hotel_id,
                 room: data.room,
                 energy: data.energy,
                 error: null,
-            })
+            }))
         }).catch(error => {
             return res.status(500).json(response({
                 success: false,
