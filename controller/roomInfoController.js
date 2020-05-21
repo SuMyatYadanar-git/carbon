@@ -59,6 +59,12 @@ const getRoomEnergyConsumption = (req, res) => {
             error: -1013,
             message: error_code[-1013]
         }))
+    }else if(Date.parse(startDate) > Date.parse(endDate)){
+       return res.status(400).json(response({
+        success: false,
+        error:-1014,
+        message:error_code[-1014]
+       }))
     }
     try {
         return roomInfoService.getRoomEnergyConsumption(no, startDate, endDate).then(data => {
@@ -109,6 +115,19 @@ const getRoomCarbonFootPrint = (req, res) => {
             message: error_code[-1013]
         }))
     }
+   else  if(startDate > endDate){
+        return res.status(400).json(response({
+                 success: false,
+                 error:-1014,
+                 message:error_code[-1014]
+                }))
+    }else if(Date.parse(startDate) > Date.parse(endDate)){
+        return res.status(400).json(response({
+         success: false,
+         error:-1014,
+         message:error_code[-1014]
+        }))
+     }
     try {
         return roomInfoService.getRoomCarbonFootPrint(id, startDate, endDate).then(data => {
             return res.json(response({

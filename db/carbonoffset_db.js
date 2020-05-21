@@ -1,20 +1,20 @@
 const mysql = require("mysql2");
 // mysql.createConnection
-// const con1 = mysql.createPool({
-//   host: "localhost",
-//    user: "root",
-//   //  user: "user125",
-//   password: "root",
-//   database: "carbon_offset_db",
-//   waitForConnections: true,
-// });
-const con1 = mysql.createConnection({
+const con1 = mysql.createPool({
   host: "localhost",
-  user: "kumo99",
+   user: "root",
+  //  user: "user125",
   password: "root",
   database: "carbon_offset_db",
   waitForConnections: true,
 });
+// const con1 = mysql.createConnection({
+//   host: "localhost",
+//   user: "kumo99",
+//   password: "root",
+//   database: "carbon_offset_db",
+//   waitForConnections: true,
+// });
 const con3 = mysql.createPool({
   host: "114.32.125.70",
   port: "33061",
@@ -244,8 +244,8 @@ const guestExits =()=>{
 
 //24 hours with date currently available
 const postUserFeedback = (hours, room_temp, hotel_temp,guestId) => {
-  console.log(hours,'query')
-  // console.log( `insert into feedback_tbl(hours_stayed,room_temp_level,hotel_building_temp_level,guest_id) values(date_format('${hours}','%Y-%m-%d %H:%i:%s  %p'), '${room_temp}', '${hotel_temp}',${guestId})`)
+  // console.log(hours,'query')
+  // console.log(  `insert into feedback_tbl(hours_stayed,room_temp_level,hotel_building_temp_level,guest_id) values('${hours}', '${room_temp}', '${hotel_temp}',${guestId})`)
   return con1
     .promise()
     .query(

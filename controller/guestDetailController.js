@@ -186,11 +186,11 @@ const postUserFeedback = (req, res) => {
     }
     // format(new Date(req.body.hours), "yyyy-MM-dd HH:mm:ss");
     //  const hours = req.body.hours
-    const hours = format(new Date(req.body.hours), "yyyy-MM-dd HH:mm:ss")
+    // const hours = format(new Date(req.body.hours), "yyyy-MM-dd HH:mm:ss")
+    const hours = req.body.hours
     const room_temp = req.body.room_temp_level;
     const hotel_temp = req.body.hotel_temp_level;
     const guestId = req.body.guest_id;
-    // console.log('format hours:',format(new Date(req.body.hours), "yyyy-MM-dd HH:mm:ss"))
     return postUserFeedbackService(hours, room_temp, hotel_temp, guestId)
       .then((data) => {
         return res.status(202).json(
@@ -203,7 +203,8 @@ const postUserFeedback = (req, res) => {
         return res.status(500).json(response({
           success: false,
           error: error.code ? error.errno : -1012,
-          message: error.code ? error_code[error.errno] : error_code[-1012]
+          message: error.code ? error_code[error.errno] : error_code[-1012],
+          payload:error
         }))
       });
   } catch (error) {

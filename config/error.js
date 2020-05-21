@@ -13,6 +13,7 @@ const error_code={
         "-1011":"No Raw Data(NAN).",
         "-1012":"Something went wrong.",
         "-1013":"Invalid date requested.",
+        "-1014":"End date must be greater than start date",
 
         "1054" :"Unknown column in sql.",
         "1064" :"SQL syntax error.",
