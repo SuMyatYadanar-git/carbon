@@ -41,14 +41,15 @@ app.get("/one-hour-manual", (req, res) => {
   service
     .oneHourScheduler(endDate)
     .then((data) =>{
-      Promise.all(data)
-        .then(resultedData => {
-          if(resultedData.filter(v => !v).length>0) {
-            res.json({error: "Not Success", error:error.toString()})
-          }
-          else res.json(resultedData)
-        })
-        .catch(error => res.json({error: error.toString()}))
+      return res.json(data)
+      // Promise.all(data)
+      //   .then(resultedData => {
+      //     if(resultedData.filter(v => !v).length>0) {
+      //       res.json({error: "Not Success",R:resultedData})
+      //     }
+      //     else res.json(resultedData)
+      //   })
+      //   .catch(error => res.status(500).json({error: error.toString()}))
       
     })
     .catch((error) => res.status(400).json({ error: error.toString() }));

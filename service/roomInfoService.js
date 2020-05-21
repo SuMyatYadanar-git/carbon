@@ -68,7 +68,8 @@ const oneHourScheduler = (currentDate) => {
   //@htookyaw 
   const todayDate = dateFnsZone.utcToZonedTime(new Date(), timezone);
   const todayTs = dateFns.setSeconds(dateFns.setMinutes(todayDate, 0), 0);
-  const isPrev = dateFns.differenceInDays(startDate,todayTs)>1;
+  // const isPrev = dateFns.differenceInDays(startDate,todayTs)>1;
+  const isPrev = dateFns.differenceInDays(todayTs, startDate) >= 1 ;
 
   const power202 = [
     "ppssbms0013",
@@ -113,7 +114,8 @@ const oneHourScheduler = (currentDate) => {
   )}' and temp1 is not null and temp1>0 order by temp1 asc`;
   // console.log('officeCoolingLoadTempInSql->',officeCoolingLoadTempInSql)
   const officeCoolingLoadTempInPromise = db.runIotMgmtQuery(
-    "m114",
+    // "m114",
+    "m202",
     officeCoolingLoadTempInSql,
     isPrev
   );
@@ -127,7 +129,8 @@ const oneHourScheduler = (currentDate) => {
     dateFormat
   )}' and temp1 is not null and temp1>0 order by temp1 asc`;
   const officeCoolingLoadTempOutPromise = db.runIotMgmtQuery(
-    "m114",
+    // "m114",
+    "m202",
     officeCoolingLoadTempOutSql,
     isPrev
   );
@@ -214,18 +217,22 @@ const oneHourScheduler = (currentDate) => {
       const hotelCoolingLoadTempOut = dataArray[5][0].map((v) => v.value);
       const powerData = dataArray[6][0];
       const roomInfo = dataArray[7][0];
-      // return ({
-      //   hoteltemp: [dataArray[4][0].length, hotelCoolingLoadTempOut.length, hotelCoolingLoadTempInSql],
-      //   dataArray,
-      //   officeCoolingLoadFlowRate,
-      //   officeCoolingLoadTempIn,
-      //   officeCoolingLoadTempOut,
-      //   hotelCoolingLoadFlowRate,
-      //   hotelCoolingLoadTempIn,
-      //   hotelCoolingLoadTempOut,
-      //   powerData,
-      // })
-      
+    // @lucy
+    //   if(dataArray.length != 0){
+    //   return ({
+    //     //  hoteltemp: [dataArray[4][0].length, hotelCoolingLoadTempOut.length, hotelCoolingLoadTempInSql],
+    //     // dataArray,
+    //     officeCoolingLoadFlowRate,
+    //     officeCoolingLoadTempIn,
+    //     officeCoolingLoadTempOut,
+    //     hotelCoolingLoadFlowRate,
+    //     hotelCoolingLoadTempIn,
+    //     hotelCoolingLoadTempOut,
+    //     powerData,
+    //   })
+    // } else{
+    //   return ('nodata at ',isPrev)
+    // }
       const officeCoolingLoadFlowRateMedian =
         officeCoolingLoadFlowRate.length / 2 === 0
           ? officeCoolingLoadFlowRate[
@@ -384,6 +391,7 @@ const oneHourScheduler = (currentDate) => {
             .then((data) => {
                 if(data.length===0) return null
                 else {
+                  // return data[0][0];
                   const result1 = db.saveResultedDataArray(data[0][0],nowDate)
                     .then(data1 => { 
                       console.log('Success save with resulted-data with prev hour:',); 

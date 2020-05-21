@@ -1,20 +1,20 @@
 const mysql = require("mysql2");
 // mysql.createConnection
-// const con1 = mysql.createPool({
-//   host: "localhost",
-//    user: "root",
-//   //  user: "user125",
-//   password: "root",
-//   database: "carbon_offset_db",
-//   waitForConnections: true,
-// });
-const con1 = mysql.createConnection({
+const con1 = mysql.createPool({
   host: "localhost",
-  user: "kumo99",
+   user: "root",
+  //  user: "user125",
   password: "root",
   database: "carbon_offset_db",
   waitForConnections: true,
 });
+// const con1 = mysql.createConnection({
+//   host: "localhost",
+//   user: "kumo99",
+//   password: "root",
+//   database: "carbon_offset_db",
+//   waitForConnections: true,
+// });
 const con3 = mysql.createPool({
   host: "114.32.125.70",
   port: "33061",
@@ -92,10 +92,10 @@ function handleDisconnect(client) {
 // m114 or m202
 const runIotMgmtQuery = async(db = "m114", query,isPrev) => {
   if (db === "m114") {
-    return await isPrev?con4.promise().query(query):con3.promise().query(query);;
+    return await isPrev?con4.promise().query(query):con3.promise().query(query);
   } else {
     // suppose m202
-    return await isPrev?con5.promise().query(query):con2.promise().query(query);;
+    return await isPrev?con5.promise().query(query):con2.promise().query(query);
   }
 };
 // ====================================================================================================
