@@ -26,11 +26,11 @@ const postGuestDetail = async (req, res) => {
         })
       );
     }
-    const firstName = req.body.firstName;
-    const lastName = req.body.lastName;
-    const roomNumber = req.body.roomNumber;
-    const checkInDate = format(new Date(req.body.checkIn), "yyyy-MM-dd HH:mm:ss");
-    const checkOutDate = format(new Date(req.body.checkOut), "yyyy-MM-dd HH:mm:ss")  //Date.parse(req.body.checkOut) 
+    const firstName = req.body.first_name;
+    const lastName = req.body.last_name;
+    const roomNumber = req.body.room_no;
+    const checkInDate = format(new Date(req.body.check_in), "yyyy-MM-dd HH:mm:ss");
+    const checkOutDate = format(new Date(req.body.check_out), "yyyy-MM-dd HH:mm:ss")  //Date.parse(req.body.checkOut) 
     // // format(
     //   new Date(req.body.checkOut),
     //   "yyyy-MM-dd HH:mm:ss"
@@ -40,8 +40,8 @@ const postGuestDetail = async (req, res) => {
       return v.first_name == firstName &&
         v.last_name == lastName &&
         v.room_no == roomNumber &&
-        dateFns.compareAsc(Date.parse(req.body.checkIn), Date.parse(v.checkin_datetime)) === 0 &&
-        dateFns.compareAsc(Date.parse(req.body.checkOut), Date.parse(v.checkout_datetime)) === 0
+        dateFns.compareAsc(Date.parse(req.body.check_in), Date.parse(v.checkin_datetime)) === 0 &&
+        dateFns.compareAsc(Date.parse(req.body.check_out), Date.parse(v.checkout_datetime)) === 0
     })
     if (filter.length === 0) {
       return postGuestDetailService(
@@ -52,9 +52,11 @@ const postGuestDetail = async (req, res) => {
         checkOutDate
       )
         .then((data) => {
+          const guest_id = data[0].length !== 0 ?data[0].insertId :null
           return res.status(201).json(
             response({
-              message: `Guest info inserted successfully`,
+              message: `Guest info inserted successfully with guest id =${guest_id}`,
+              payload:{guest_id}
             })
           );
         })
