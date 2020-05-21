@@ -29,7 +29,6 @@ app.use(morgan("dev"));
 app.use(router);
 
 app.get('/hi',(req,res)=> {
-  service.oneHourSchedulerAuto().then(d=>console.log(d))
   return res.json('hello server')
 })
 app.get("/one-hour-manual", (req, res) => {
