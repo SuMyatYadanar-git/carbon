@@ -29,7 +29,6 @@ app.use(morgan("dev"));
 app.use(router);
 
 app.get('/hi',(req,res)=> {
-  service.oneHourSchedulerAuto().then(d=>console.log(d))
   return res.json('hello server')
 })
 app.get("/one-hour-manual", (req, res) => {
@@ -41,15 +40,14 @@ app.get("/one-hour-manual", (req, res) => {
   service
     .oneHourScheduler(endDate)
     .then((data) =>{
-      // return res.json(data)
-       Promise.all(data)
+      Promise.all(data)
         .then(resultedData => {
           if(resultedData.filter(v => !v).length>0) {
-            res.json({error: "Not Success",R:resultedData})
+            res.json({error: "Not Success", error:error.toString()})
           }
           else res.json(resultedData)
         })
-        .catch(error => res.status(500).json({error: error.toString()}))
+        .catch(error => res.json({error: error.toString()}))
       
     })
     .catch((error) => res.status(400).json({ error: error.toString() }));

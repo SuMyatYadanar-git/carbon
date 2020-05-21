@@ -35,7 +35,8 @@ const getRoomInfoById = (req, res) => {
         return res.status(500).json(response({
             success: false,
             error: -1003,
-            message: error_code[-1003]
+            message: error_code[-1003],
+            
         }))
     }
 

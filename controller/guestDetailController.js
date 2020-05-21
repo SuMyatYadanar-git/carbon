@@ -52,11 +52,11 @@ const postGuestDetail = async (req, res) => {
         checkOutDate
       )
         .then((data) => {
-          const guest_id = data[0].length !== 0 ?data[0].insertId :null
+          const guest_id = data[0].insertId
           return res.status(201).json(
             response({
               message: `Guest info inserted successfully with guest id =${guest_id}`,
-              payload:{guest_id}
+              payload:{guest_id }
             })
           );
         })
