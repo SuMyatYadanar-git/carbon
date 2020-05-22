@@ -1,8 +1,6 @@
-const { sub, set, add, parseISO, format, isBefore } = require("date-fns");
+const {  format } = require("date-fns");
 var dateFns = require('date-fns')
-const dateFnsZone = require("date-fns-tz");
 const { validationResult } = require("express-validator");
-const error_code = require("../config/error");
 const {
   postGuestDetailService,
   getGuestService,
@@ -12,19 +10,19 @@ const {
   getGuestInfoDataService,
 } = require("../service/guestService");
 const response = require("../config/response");
-const msgInfo = require("../config/msg");
 
-const postGuestDetail = async (req, res) => {
+const postGuestDetail = async (req, res, next) => {
   try {
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
-      return res.status(422).json(
-        response({
-          success: false,
-          error: -1005,
-          message: errors.array(),
-        })
-      );
+      next({ status: 422, error:{ errno: -1005 } })
+      // return res.status(422).json(
+      //   response({
+      //     success: false,
+      //     error: -1005,
+      //     message: errors.array(),
+      //   })
+      // );
     }
     const firstName = req.body.first_name;
     const lastName = req.body.last_name;
@@ -32,10 +30,7 @@ const postGuestDetail = async (req, res) => {
     const checkInDate = format(new Date(req.body.check_in), "yyyy-MM-dd HH:mm:ss");
     const checkOutDate = format(new Date(req.body.check_out), "yyyy-MM-dd HH:mm:ss");  //Date.parse(req.body.checkOut) 
     const hotelId = req.body.hotel_id;
-    // // format(
-    //   new Date(req.body.checkOut),
-    //   "yyyy-MM-dd HH:mm:ss"
-    // );
+  
     const checkGuestInfo = await getGuestInfoDataService()
     const filter = checkGuestInfo[0].filter((v) => {
       return v.first_name == firstName &&
@@ -59,47 +54,55 @@ const postGuestDetail = async (req, res) => {
           return res.status(201).json(
             response({
               message: `Guest info inserted successfully with guest id =${guest_id}`,
-              payload:{guest_id }
+              payload: { guest_id }
             })
           );
         })
         .catch((error) => {
-          return res.status(500).json(response({
-            success: false,
-            error: error.code ? error.errno : -1012,
-            message: error.code ? error_code[error.errno] : error_code[-1012]
-          }))
+          return next({ status: 500, error:error })
+          // return res.status(500).json(response({
+          //   success: false,
+          //   error: error.code ? error.errno : -1012,
+          //   message: error.code ? error_code[error.errno] : error_code[-1012]
+          // }))
         });
     } else {
-      return res.status(409).json(
-        response({
-          success: false,
-          message: error_code[-1006],
-          error: "-1006",
-        })
-      );
+      return next({ status: 409, error: { errno: -1006 } })
+      // return res.status(409).json(
+      //   response({
+      //     success: false,
+      //     message: error_code[-1006],
+      //     error: "-1006",
+      //   })
+      // );
     }
   } catch (error) {
-    return res.status(500).json(response({
-      success: false,
-      error: -1003,
-      message: error_code[-1003]
-    }))
+    return next({ status: 500, error: { errno: -1003 } })
+    // return res.status(500).json(response({
+    //   success: false,
+    //   error: -1003,
+    //   message: error_code[-1003]
+    // }))
   }
 };
 // get Guest-info at roomNo
-const getGuestInfo = (req, res) => {
+
+const getGuestInfo = (req, res, next) => {
   try {
     const roomNo = req.query.room_no;
     const guestId = req.query.guest_id;
     const hotelId = req.query.hotel_id;
 
     if (!roomNo || !guestId || !hotelId) {
-      return res.status(400).json(response({
-        success: false,
-        error: -1004,
-        message: error_code[-1004]
-      }))
+      // return res.status(400).json(response({
+      //   success: false,
+      //   error: -1004,
+      //   message: error_code[-1004]
+      // }))
+      return next({
+        status: 400,
+        error: { errno: -1004 }
+      })
     }
     return getGuestService(roomNo, guestId,hotelId)
       .then((data) => {
@@ -108,42 +111,44 @@ const getGuestInfo = (req, res) => {
           .json(response({ success: true, payload: data[0] }));
       })
       .catch((error) => {
-        return res.status(500).json(response({
-          success: false,
-          error: error.code ? error.errno : -1012,
-          message: error.code ? error_code[error.errno] : error_code[-1012]
-        }))
+        return next(
+          { status: 500, error: error }
+        )
+        // return res.status(500).json(response({
+        //   success: false,
+        //   error: error.code ? error.errno : -1012,
+        //   message: error.code ? error_code[error.errno] : error_code[-1012]
+        // }))
       });
 
   } catch (error) {
-    return res.status(500).json(response({
-      success: false,
-      error: -1003,
-      message: error_code[-1003]
-    }))
+    return next({ status: 500, error: { errno: -1003 } })
   }
 };
 
-const newsLetter = async (req, res) => {
+
+const newsLetter = async (req, res, next) => {
   try {
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
-      return res.status(422).json(
-        response({
-          success: false,
-          error: -1005,
-          message: errors.array(),
-        })
-      );
+      next({ status: 422, error:{ errno: -1005 } })
+      // return res.status(422).json(
+      //   response({
+      //     success: false,
+      //     error: -1005,
+      //     message: errors.array(),
+      //   })
+      // );
     }
     const email = req.body.email;
     const hotelId = req.body.hotel_id;
     const roomNo = req.body.room_no ;
     
     const emailExit = await getNewsletter(email);
-    let filterEmail = emailExit[0].map((v) => {
-      return v.email === email ? v.email : email;
-    });
+  // map return   v.email === email ? v.email : email 
+    const filterEmail =emailExit[0].filter((v) => {
+      return v.email == email && v.hotel_id == hotelId
+    })
     if (filterEmail.length === 0) {
       return newsLetterService(email,hotelId,roomNo)
         .then((data) => {
@@ -154,51 +159,56 @@ const newsLetter = async (req, res) => {
           );
         })
         .catch((error) => {
-          return res.status(500).json(response({
-            success: false,
-            error: error.code ? error.errno : -1012,
-            message: error.code ? error_code[error.errno] : error_code[-1012]
-          }))
+          return next({ status: 500, error: error })
+          // return res.status(500).json(response({
+          //   success: false,
+          //   error: error.code ? error.errno : -1012,
+          //   message: error.code ? error_code[error.errno] : error_code[-1012]
+          // }))
         });
     } else {
-      return res.status(409).json(
-        response({
-          success: false,
-          message: error_code[-1006],
-          error: "-1006",
-        })
-      );
+      return next({ status: 409, error: { errno: -1006 } })
+      // return res.status(409).json(
+      //   response({
+      //     success: false,
+      //     message: error_code[-1006],
+      //     error: "-1006",
+      //   })
+      // );
     }
 
   } catch (error) {
-    return res.status(500).json(response({
-      success: false,
-      error: -1003,
-      message: error_code[-1003],
-    }))
+    return next({ status: 500, error: { errno: -1003 } })
+    // return res.status(500).json(response({
+    //   success: false,
+    //   error: -1003,
+    //   message: error_code[-1003]
+    // }))
   }
 };
 
-const postUserFeedback = (req, res) => {
+
+const postUserFeedback = (req, res, next) => {
   try {
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
-      return res.status(422).json(
-        response({
-          success: false,
-          error: -1005,
-          message: errors.array(),
-        })
-      );
+      next({ status: 422, error:{ errno: -1005 } })
+      // return res.status(422).json(
+      //   response({
+      //     success: false,
+      //     error: -1005,
+      //     message: errors.array(),
+      //   })
+      // );
     }
-    // format(new Date(req.body.hours), "yyyy-MM-dd HH:mm:ss");
-    //  const hours = req.body.hours
-    // const hours = format(new Date(req.body.hours), "yyyy-MM-dd HH:mm:ss")
+ 
     const hours = req.body.hours
     const room_temp = req.body.room_temp_level;
     const hotel_temp = req.body.hotel_temp_level;
     const guestId = req.body.guest_id;
-    return postUserFeedbackService(hours, room_temp, hotel_temp, guestId)
+    const hotelId = req.body.hotel_id;
+    const roomNo = req.body.room_no;
+    return postUserFeedbackService(hours, room_temp, hotel_temp, guestId,hotelId,roomNo)
       .then((data) => {
         return res.status(202).json(
           response({
@@ -207,19 +217,21 @@ const postUserFeedback = (req, res) => {
         );
       })
       .catch((error) => {
-        return res.status(500).json(response({
-          success: false,
-          error: error.code ? error.errno : -1012,
-          message: error.code ? error_code[error.errno] : error_code[-1012],
-          payload:error
-        }))
+        return next({ status: 500, error: error })
+        // return res.status(500).json(response({
+        //   success: false,
+        //   error: error.code ? error.errno : -1012,
+        //   message: error.code ? error_code[error.errno] : error_code[-1012],
+        //   payload: error
+        // }))
       });
   } catch (error) {
-    return res.status(500).json(response({
-      success: false,
-      error: -1003,
-      message: error_code[-1003]
-    }))
+    return next({ status: 500, error: { errno: -1003 } })
+    // return res.status(500).json(response({
+    //   success: false,
+    //   error: -1003,
+    //   message: error_code[-1003]
+    // }))
   }
 };
 

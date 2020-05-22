@@ -20,8 +20,8 @@ const getNewsletter = (email)=>{
 	return db.newsLetterMailExist(email)
 }
 // post user-feedback
-const postUserFeedbackService =(hours,room_temp,hotel_temp,guestId)=>{
-	return db.postUserFeedback(hours,room_temp,hotel_temp,guestId)
+const postUserFeedbackService =(hours,room_temp,hotel_temp,guestId,hotelId,roomNo)=>{
+	return db.postUserFeedback(hours,room_temp,hotel_temp,guestId,hotelId,roomNo)
 }
 
 module.exports = {postGuestDetailService,getGuestService,newsLetterService,getNewsletter,postUserFeedbackService,getGuestInfoDataService}

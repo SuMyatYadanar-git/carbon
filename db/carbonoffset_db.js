@@ -1,20 +1,20 @@
 const mysql = require("mysql2");
 // mysql.createConnection
-const con1 = mysql.createPool({
-  host: "localhost",
-   user: "root",
-  //  user: "user125",
-  password: "root",
-  database: "carbon_offset_db",
-  waitForConnections: true,
-});
-// const con1 = mysql.createConnection({
+// const con1 = mysql.createPool({
 //   host: "localhost",
-//   user: "kumo99",
+//    user: "root",
+//   //  user: "user125",
 //   password: "root",
 //   database: "carbon_offset_db",
 //   waitForConnections: true,
 // });
+const con1 = mysql.createConnection({
+  host: "localhost",
+  user: "kumo99",
+  password: "root",
+  database: "carbon_offset_db",
+  waitForConnections: true,
+});
 const con3 = mysql.createPool({
   host: "114.32.125.70",
   port: "33061",
@@ -22,7 +22,8 @@ const con3 = mysql.createPool({
   password: "kumo99",
   database: "iotmgmt",
   waitForConnections: true,
-  connectTimeout:30000,
+
+  connectTimeout: 30000,
   //  database : 'iotdata',
   trace: true,
 });
@@ -43,7 +44,8 @@ const con4 = mysql.createPool({
   password: "kumo99",
   database: "iotdata",
   waitForConnections: true,
-  connectTimeout:30000,
+
+  connectTimeout: 30000,
   //  database : 'iotdata',
   trace: true,
 });
@@ -72,7 +74,8 @@ handleDisconnect(con2);
 function handleDisconnect(client) {
   client.on("error", function (error) {
     try {
-      console.error("\n> Re-connecting lost MySQL connection: " + client.config.host + " : " + error.code + " : " + error.message );
+
+      console.error("\n> Re-connecting lost MySQL connection: " + client.config.host + " : " + error.code + " : " + error.message);
       if (!error.fatal) {
         console.error("not fatal");
         return;
@@ -90,31 +93,20 @@ function handleDisconnect(client) {
 
 // developed by @nayhtet
 // m114 or m202
-const runIotMgmtQuery = async(db = "m114", query,isPrev) => {
+
+const runIotMgmtQuery = async (db = "m114", query, isPrev) => {
   if (db === "m114") {
-    return await isPrev?con4.promise().query(query):con3.promise().query(query);;
+ 
+    return await isPrev ? con4.promise().query(query) : con3.promise().query(query);;
   } else {
     // suppose m202
-    return await isPrev?con5.promise().query(query):con2.promise().query(query);;
+
+    return await isPrev ? con5.promise().query(query) : con2.promise().query(query);;
   }
 };
 // ====================================================================================================
 // @lucy
 const saveResultedData = (data) => {
-  //  console.log('queryTest==>',`
-  //  insert into 
-  //    resulted_data(roomNo, coolingRequired, roomType, officeCoolingLoad,hotelCoolingLoad,powerDataTotal,plantEfficiency,energyConsumption,startTs,dataColor) 
-  //    values (
-  //      ${data.roomNo},
-  //      ${data.coolingRequired},
-  //      '${data.roomType}',
-  //      ${data.officeCoolingLoad},
-  //      ${data.hotelCoolingLoad},
-  //      ${data.powerDataTotal},
-  //      ${data.plantEfficiency},
-  //      ${data.energyConsumption},
-  //      '${data.startTs}',
-  //      '${data.dataColor}')`)
   return con1.promise().query(`
       insert into 
         resulted_data(roomNo, coolingRequired, roomType, officeCoolingLoad,hotelCoolingLoad,powerDataTotal,plantEfficiency,energyConsumption,startTs,dataColor) 
@@ -131,22 +123,9 @@ const saveResultedData = (data) => {
           '${data.dataColor}')`);
 };
 // saveResultedDataAraay for previous time
-const saveResultedDataArray=(data,ts)=>{
-  // console.log('queryTest==>',`
-  // insert into 
-  //   resulted_data(roomNo, coolingRequired, roomType, officeCoolingLoad,hotelCoolingLoad,powerDataTotal,plantEfficiency,energyConsumption,startTs,dataColor) 
-  //   values (
-  //     ${data.roomNo},
-  //     ${data.coolingRequired},
-  //     '${data.roomType}',
-  //     ${data.officeCoolingLoad},
-  //     ${data.hotelCoolingLoad},
-  //     ${data.powerDataTotal},
-  //     ${data.plantEfficiency},
-  //     ${data.energyConsumption},
-  //     '${ts}',
-  //     '${data.dataColor}')`)
-    return con1.promise().query(`
+
+const saveResultedDataArray = (data, ts) => {
+  return con1.promise().query(`
     insert into 
       resulted_data(roomNo, coolingRequired, roomType, officeCoolingLoad,hotelCoolingLoad,powerDataTotal,plantEfficiency,energyConsumption,startTs,dataColor) 
       values (
@@ -159,10 +138,11 @@ const saveResultedDataArray=(data,ts)=>{
         ${data.plantEfficiency},
         ${data.energyConsumption},
         '${ts}',
-        '${data.dataColor}')`);  
+
+        '${data.dataColor}')`);
 }
 const getResultedData = (date, roomNo) => {
-   console.log(date, "getResulted");
+  console.log(date, "getResulted");
   return con1
     .promise()
     .query(`select * from resulted_data where startTs='${date}' and roomNo=${roomNo}`);
@@ -190,7 +170,7 @@ const hourlyRoomEnergyConsumption = (hotelId,id, startDate, endDate) => {
 };
 // get room info by id
 const getRoomInfoById = (room_id, hotel_id) => {
-  console.log(room_id,hotel_id,'query')
+  // console.log(room_id,hotel_id,'query')
   return con1
     .promise()
     .query(
@@ -203,6 +183,7 @@ const getRoomInfo = () => {
 
 // get hotel-info
 const getHotelInfo = () => {
+
   return con1.promise()
   .query(`select hotel.*,room.room_no from hotel_info as hotel left join room_info as room  on hotel.hotel_id = room.hotel_id `);
 };
@@ -226,9 +207,10 @@ const postGuestDetail = (
     );
 };
 // get guest-info
+
 const getGuestInfoWithRoomNo = (roomNo,guestId,hotelId)=>{
   return con1.promise()
-  .query(`select concat(guest.first_name,' ',guest.last_name) AS full_name,date_format(guest.checkin_datetime,'%Y-%m-%d %H:%i:%s  %p') as check_in,date_format(guest.checkout_datetime,'%Y-%m-%d %H:%i:%s  %p') as check_out,guest.room_no ,room.room_type  from carbon_offset_db.guest_info as guest
+    .query(`select concat(guest.first_name,' ',guest.last_name) AS full_name,date_format(guest.checkin_datetime,'%Y-%m-%d %H:%i:%s  %p') as check_in,date_format(guest.checkout_datetime,'%Y-%m-%d %H:%i:%s  %p') as check_out,guest.room_no ,room.room_type  from carbon_offset_db.guest_info as guest
   left join carbon_offset_db.room_info as room  on guest.room_no = room.room_no
   where room.room_no=${roomNo}  and guest.guest_id=${guestId} and room.hotel_id=${hotelId}`)
 }
@@ -242,20 +224,19 @@ const newsLetter = (email,hotelId,roomNo) => {
 const newsLetterMailExist = (email) => {
   return con1
     .promise()
-    .query(`select email from news_letter_tbl where email='${email}'`);
+    .query(`select email,hotel_id,room_no from news_letter_tbl where email='${email}'`);
 };
 
-const guestExits =()=>{
+
+const guestExits = () => {
   return con1.promise().query(`select * from guest_info`)
 }
 
-//24 hours with date currently available
-const postUserFeedback = (hours, room_temp, hotel_temp,guestId,hotelId) => {
-  // console.log(hours,'query')
+const postUserFeedback = (hours, room_temp, hotel_temp, guestId,hotelId,roomNo) => {
   return con1
     .promise()
     .query(
-      `insert into feedback_tbl(hours_stayed,room_temp_level,hotel_building_temp_level,guest_id) values('${hours}', '${room_temp}', '${hotel_temp}',${guestId})`
+      `insert into feedback_tbl(hours_stayed,room_temp_level,hotel_building_temp_level,guest_id,hotel_id,room_no) values('${hours}', '${room_temp}', '${hotel_temp}',${guestId},${hotelId},${roomNo})`
     );
 };
 
@@ -265,7 +246,10 @@ const getLastTimeData = (query) => {
     .promise()
     .query(query);
 }
-
+const getErrorCodes = (code=-1012) => {
+  const query = `select * from error_tbl where error_code=${code}`;
+  return con1.promise().query(query);
+}
 // ====================================================================================================================================================================
 
 module.exports = {
@@ -288,4 +272,5 @@ module.exports = {
   pingAllDBs,
   getLastTimeData,
   guestExits,
+  getErrorCodes
 };

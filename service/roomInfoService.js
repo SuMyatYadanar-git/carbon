@@ -251,7 +251,7 @@ const oneHourScheduler = (currentDate) => {
                   lossData=false;
                   const result1 = await db.saveResultedDataArray(previousResult[0][0], curDate);
                    if(result1[0]){
-                     console.log("save previous data success",previousResult[0][0],room.room_no)
+                    //  console.log("save previous data success",previousResult[0][0],room.room_no)
                     resultedArray.push(previousResult[0][0])                     
                    }
                  }
@@ -280,12 +280,10 @@ const oneHourScheduler = (currentDate) => {
             };
             const result = await db.saveResultedData(resultedData)
             if(result[0]){
-              console.log("save previous data success with zeros",room.room_no,curDate)
+              // console.log("save previous data success with zeros",room.room_no,curDate)
               resultedArray.push(resultedData)                     
             }
           }
-
-        
         }
         return resultedArray
       }
@@ -492,7 +490,7 @@ const oneHourScheduler = (currentDate) => {
               })
               .catch(error => {
                 console.error("Error save room-info: " + error.toString())
-                return null
+                return null;
               })
             resultedArray.push(result)
           // }
