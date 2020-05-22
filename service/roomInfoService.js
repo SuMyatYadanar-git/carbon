@@ -71,7 +71,7 @@ const oneHourScheduler = (currentDate) => {
   const todayDate = dateFnsZone.utcToZonedTime(new Date(), timezone);
   const todayTs = dateFns.setSeconds(dateFns.setMinutes(todayDate, 0), 0);
   // const isPrev = dateFns.differenceInDays(startDate,todayTs)>1;
-  const isPrev = false//dateFns.differenceInDays(todayTs, startDate) >= 1;
+  const isPrev = dateFns.differenceInDays(todayTs, startDate) >= 1;
 
   const power202 = [
     "ppssbms0013",
@@ -553,8 +553,7 @@ const getRoomInfo = () => {
       return data;
     })
     .catch((error) => {
-      console.log(error, "in get roominfo");
-      return { error: '-1009' };
+     
     });
 };
 // get room info by id

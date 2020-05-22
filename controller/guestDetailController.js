@@ -26,11 +26,11 @@ const postGuestDetail = async (req, res) => {
         })
       );
     }
-    const firstName = req.body.firstName;
-    const lastName = req.body.lastName;
-    const roomNumber = req.body.roomNumber;
-    const checkInDate = format(new Date(req.body.checkIn), "yyyy-MM-dd HH:mm:ss");
-    const checkOutDate = format(new Date(req.body.checkOut), "yyyy-MM-dd HH:mm:ss")  //Date.parse(req.body.checkOut) 
+    const firstName = req.body.first_name;
+    const lastName = req.body.last_name;
+    const roomNumber = req.body.room_no;
+    const checkInDate = format(new Date(req.body.check_in), "yyyy-MM-dd HH:mm:ss");
+    const checkOutDate = format(new Date(req.body.check_out), "yyyy-MM-dd HH:mm:ss")  //Date.parse(req.body.checkOut) 
     // // format(
     //   new Date(req.body.checkOut),
     //   "yyyy-MM-dd HH:mm:ss"
@@ -40,8 +40,8 @@ const postGuestDetail = async (req, res) => {
       return v.first_name == firstName &&
         v.last_name == lastName &&
         v.room_no == roomNumber &&
-        dateFns.compareAsc(Date.parse(req.body.checkIn), Date.parse(v.checkin_datetime)) === 0 &&
-        dateFns.compareAsc(Date.parse(req.body.checkOut), Date.parse(v.checkout_datetime)) === 0
+        dateFns.compareAsc(Date.parse(req.body.check_in), Date.parse(v.checkin_datetime)) === 0 &&
+        dateFns.compareAsc(Date.parse(req.body.check_out), Date.parse(v.checkout_datetime)) === 0
     })
     if (filter.length === 0) {
       return postGuestDetailService(
@@ -52,9 +52,11 @@ const postGuestDetail = async (req, res) => {
         checkOutDate
       )
         .then((data) => {
+          const guest_id = data[0].insertId
           return res.status(201).json(
             response({
-              message: `Guest info inserted successfully`,
+              message: `Guest info inserted successfully with guest id =${guest_id}`,
+              payload:{guest_id }
             })
           );
         })
@@ -184,11 +186,11 @@ const postUserFeedback = (req, res) => {
     }
     // format(new Date(req.body.hours), "yyyy-MM-dd HH:mm:ss");
     //  const hours = req.body.hours
-    const hours = format(new Date(req.body.hours), "yyyy-MM-dd HH:mm:ss")
+    // const hours = format(new Date(req.body.hours), "yyyy-MM-dd HH:mm:ss")
+    const hours = req.body.hours
     const room_temp = req.body.room_temp_level;
     const hotel_temp = req.body.hotel_temp_level;
     const guestId = req.body.guest_id;
-    // console.log('format hours:',format(new Date(req.body.hours), "yyyy-MM-dd HH:mm:ss"))
     return postUserFeedbackService(hours, room_temp, hotel_temp, guestId)
       .then((data) => {
         return res.status(202).json(
@@ -201,7 +203,8 @@ const postUserFeedback = (req, res) => {
         return res.status(500).json(response({
           success: false,
           error: error.code ? error.errno : -1012,
-          message: error.code ? error_code[error.errno] : error_code[-1012]
+          message: error.code ? error_code[error.errno] : error_code[-1012],
+          payload:error
         }))
       });
   } catch (error) {

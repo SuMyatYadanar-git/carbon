@@ -4,7 +4,7 @@ const error_code={
         "-1002":"Server url not found.",
         "-1003":"Internal server error.",
         "-1004":"Invalid request payload.",
-        "-1005":"Invalid req format.",
+        "-1005":"Invalid request format.",
         "-1006":"Input already exists.",
         "-1007":"Calculation error.",
         "-1008":"Service unavailable.",
@@ -13,6 +13,7 @@ const error_code={
         "-1011":"No Raw Data(NAN).",
         "-1012":"Something went wrong.",
         "-1013":"Invalid date requested.",
+        "-1014":"End date must be greater than start date",
 
         "1054" :"Unknown column in sql.",
         "1064" :"SQL syntax error.",
