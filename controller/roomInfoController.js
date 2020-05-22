@@ -39,7 +39,7 @@ const getRoomInfoById = (req, res, next) => {
         //catching the error such reference error
 
         return next(
-            { status: 500, error: error }
+            { status: 500, error: -1003 }
         )
 
     }
@@ -91,12 +91,12 @@ const getRoomEnergyConsumption = (req, res, next) => {
         // }))
     }
     else if (!hotelId) {
-        return res.status(400).json(response({
-            success: false,
-            error: -1004,
-            message: error_code[-1004]
-        }))
+        return next({
+            status: 400,
+            error: { errno: -1004 }
+        })
     }
+    
     try {
 
         return roomInfoService.getRoomEnergyConsumption(hotelId, no, startDate, endDate).then(data => {
@@ -112,7 +112,7 @@ const getRoomEnergyConsumption = (req, res, next) => {
                 })
             }))
         }).catch(error => {
-
+            console.log(error)
 
             return next(
                 { status: 500, error: error }
@@ -125,7 +125,6 @@ const getRoomEnergyConsumption = (req, res, next) => {
         })
 
     } catch (error) {
-
 
         return next({ status: 500, error: { errno: -1003 } })
 
