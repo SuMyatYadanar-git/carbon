@@ -13,6 +13,7 @@ router.post('/guest-detail',[
     check('room_no').notEmpty().trim().isNumeric(),
     check('check_in').trim().notEmpty().isISO8601().toDate().withMessage('checkIn must be in correct format YYYY-mm-dd 00:00:00'),
     check('check_out').trim().notEmpty().isISO8601().toDate().withMessage('checkOut must be in correct format YYYY-mm-dd 00:00:00'),
+    check('hotel_id').notEmpty().notEmpty().trim().isNumeric()
 ],guestDetailController.postGuestDetail)
 
  // http://localhost:5000/reports/newsletter post
@@ -20,7 +21,9 @@ router.post('/guest-detail',[
 // "email":"lucy1@gmail.com"
 router.post('/newsletter',[
     check('email').isEmail().exists().trim()
-    .withMessage('Email is already exists!!!')
+    .withMessage('Email is already exists!!!'),
+    check('hotel_id').notEmpty().trim().isNumeric(),
+    //  check('room_no').trim().isNumeric()
 ],guestDetailController.newsLetter)
 
 // http://localhost:5055/reports/guest-info?roomNo=301

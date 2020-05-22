@@ -30,7 +30,8 @@ const postGuestDetail = async (req, res) => {
     const lastName = req.body.last_name;
     const roomNumber = req.body.room_no;
     const checkInDate = format(new Date(req.body.check_in), "yyyy-MM-dd HH:mm:ss");
-    const checkOutDate = format(new Date(req.body.check_out), "yyyy-MM-dd HH:mm:ss")  //Date.parse(req.body.checkOut) 
+    const checkOutDate = format(new Date(req.body.check_out), "yyyy-MM-dd HH:mm:ss");  //Date.parse(req.body.checkOut) 
+    const hotelId = req.body.hotel_id;
     // // format(
     //   new Date(req.body.checkOut),
     //   "yyyy-MM-dd HH:mm:ss"
@@ -41,7 +42,8 @@ const postGuestDetail = async (req, res) => {
         v.last_name == lastName &&
         v.room_no == roomNumber &&
         dateFns.compareAsc(Date.parse(req.body.check_in), Date.parse(v.checkin_datetime)) === 0 &&
-        dateFns.compareAsc(Date.parse(req.body.check_out), Date.parse(v.checkout_datetime)) === 0
+        dateFns.compareAsc(Date.parse(req.body.check_out), Date.parse(v.checkout_datetime)) === 0 &&
+        v.hotel_id == hotelId
     })
     if (filter.length === 0) {
       return postGuestDetailService(
@@ -49,7 +51,8 @@ const postGuestDetail = async (req, res) => {
         lastName,
         roomNumber,
         checkInDate,
-        checkOutDate
+        checkOutDate,
+        hotelId
       )
         .then((data) => {
           const guest_id = data[0].insertId
@@ -134,12 +137,15 @@ const newsLetter = async (req, res) => {
       );
     }
     const email = req.body.email;
+    const hotelId = req.body.hotel_id;
+    const roomNo = req.body.room_no ;
+    
     const emailExit = await getNewsletter(email);
     let filterEmail = emailExit[0].map((v) => {
       return v.email === email ? v.email : email;
     });
     if (filterEmail.length === 0) {
-      return newsLetterService(email)
+      return newsLetterService(email,hotelId,roomNo)
         .then((data) => {
           return res.status(202).json(
             response({
@@ -168,7 +174,7 @@ const newsLetter = async (req, res) => {
     return res.status(500).json(response({
       success: false,
       error: -1003,
-      message: error_code[-1003]
+      message: error_code[-1003],
     }))
   }
 };

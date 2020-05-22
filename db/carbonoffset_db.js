@@ -1,20 +1,20 @@
 const mysql = require("mysql2");
 // mysql.createConnection
-// const con1 = mysql.createPool({
-//   host: "localhost",
-//    user: "root",
-//   //  user: "user125",
-//   password: "root",
-//   database: "carbon_offset_db",
-//   waitForConnections: true,
-// });
-const con1 = mysql.createConnection({
+const con1 = mysql.createPool({
   host: "localhost",
-  user: "kumo99",
+   user: "root",
+  //  user: "user125",
   password: "root",
   database: "carbon_offset_db",
   waitForConnections: true,
 });
+// const con1 = mysql.createConnection({
+//   host: "localhost",
+//   user: "kumo99",
+//   password: "root",
+//   database: "carbon_offset_db",
+//   waitForConnections: true,
+// });
 const con3 = mysql.createPool({
   host: "114.32.125.70",
   port: "33061",
@@ -214,14 +214,15 @@ const postGuestDetail = (
   lastName,
   roomNumber,
   checkInDate,
-  checkOutDate
+  checkOutDate,
+  hotelId
 ) => {
   // console.log(checkOutDate,checkInDate)
   return con1
     .promise()
     .query(
-      `insert into guest_info(first_name,last_name,room_no,checkin_datetime,checkout_datetime) values(?,?,?,?,?)`,
-      [firstName, lastName, roomNumber, checkInDate, checkOutDate]
+      `insert into guest_info(first_name,last_name,room_no,checkin_datetime,checkout_datetime,hotel_id) values(?,?,?,?,?,?)`,
+      [firstName, lastName, roomNumber, checkInDate, checkOutDate,hotelId]
     );
 };
 // get guest-info
@@ -232,10 +233,11 @@ const getGuestInfoWithRoomNo = (roomNo,guestId,hotelId)=>{
   where room.room_no=${roomNo}  and guest.guest_id=${guestId} and room.hotel_id=${hotelId}`)
 }
 
-const newsLetter = (email) => {
+const newsLetter = (email,hotelId,roomNo) => {
+ const room = !roomNo ? null : roomNo
   return con1
     .promise()
-    .query(`insert into news_letter_tbl(email)values('${email}')`);
+    .query(`insert into news_letter_tbl(email,hotel_id,room_no) values ('${email}',${hotelId},${room})`);
 };
 const newsLetterMailExist = (email) => {
   return con1
@@ -248,9 +250,8 @@ const guestExits =()=>{
 }
 
 //24 hours with date currently available
-const postUserFeedback = (hours, room_temp, hotel_temp,guestId) => {
+const postUserFeedback = (hours, room_temp, hotel_temp,guestId,hotelId) => {
   // console.log(hours,'query')
-  // console.log(  `insert into feedback_tbl(hours_stayed,room_temp_level,hotel_building_temp_level,guest_id) values('${hours}', '${room_temp}', '${hotel_temp}',${guestId})`)
   return con1
     .promise()
     .query(

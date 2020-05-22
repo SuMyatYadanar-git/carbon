@@ -1,8 +1,8 @@
 const db = require('../db/carbonoffset_db')
 
 // post guest-detail
-const postGuestDetailService = (firstName,lastName,roomNumber,checkInDate,checkOutDate)=>{
-	return db.postGuestDetail(firstName,lastName,roomNumber,checkInDate,checkOutDate)
+const postGuestDetailService = (firstName,lastName,roomNumber,checkInDate,checkOutDate,hotelId)=>{
+	return db.postGuestDetail(firstName,lastName,roomNumber,checkInDate,checkOutDate,hotelId)
 }
 // get guest-detail service
 const getGuestService =(roomNo,guestId,hotelId)=>{
@@ -13,8 +13,8 @@ const getGuestInfoDataService =()=>{
 }
 
 // post newsletter email
-const newsLetterService=(email)=>{
-	return db.newsLetter(email)
+const newsLetterService=(email,hoetelId,roomNo)=>{
+	return db.newsLetter(email,hoetelId,roomNo)
 }
 const getNewsletter = (email)=>{
 	return db.newsLetterMailExist(email)
