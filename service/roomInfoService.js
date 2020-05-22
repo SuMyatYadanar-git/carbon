@@ -514,15 +514,16 @@ const getCommaSeparatedString = (arr, quote = true) => {
 
 // ==========================================================================================================
 //get room energy consumption by id ,startdate,enddate
-const getRoomEnergyConsumption = (no, startDate, endDate) => {
-  return db.oneHourEnergyConsumption(no, startDate, endDate);
+const getRoomEnergyConsumption = (hotelId,no, startDate, endDate) => {
+  console.log('service',hotelId)
+  return db.oneHourEnergyConsumption(hotelId,no,startDate, endDate);
 };
 
 //get room carbon footprint by id,startdate,enddate
-const getRoomCarbonFootPrint = async (id, startDate, endDate) => {
+const getRoomCarbonFootPrint = async (hotelId,id, startDate, endDate) => {
   // const coefficient = await getCoefficient();
   return db
-    .hourlyRoomEnergyConsumption(id, startDate, endDate)
+    .hourlyRoomEnergyConsumption(hotelId,id, startDate, endDate)
     .then((data) => {
       // const Coefficient = coefficient.reduce((r,c)=> { return r+c.coefficient},null) ;
       const totalEnergy = data[0].reduce((r, c) => r + c.energyConsumption, 0);
@@ -564,6 +565,7 @@ const getRoomInfoById = (room_id, hotel_id) => {
 const getHotelInfoData = () => {
   return db.getHotelInfo();
 };
+
 // room data not using currently
 const getRoomData = (startDate, endDate, hotel_id, room_id) => {
   const promise1 = getRoomInfoById(room_id, hotel_id);

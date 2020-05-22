@@ -169,24 +169,28 @@ const getResultedData = (date, roomNo) => {
 };
 
 // one-hour energy-consumption for room_id,startdate and enddate
-const oneHourEnergyConsumption = (no, startDate, endDate) => {
+const oneHourEnergyConsumption = (hotelId,no, startDate, endDate) => {
   return con1
     .promise()
     .query(
-      `SELECT energyConsumption,dataColor,startTs as ts from resulted_data where roomNo=${no} and startTs between '${startDate}' and '${endDate}' `
+      `SELECT result.energyConsumption,result.dataColor,result.startTs as ts,room.hotel_id  from resulted_data as result
+      left join room_info as room on room.room_no = result.roomNo 
+      where room.hotel_id=${hotelId} and result.roomNo=${no} and result.startTs between '${startDate}' and '${endDate}' `
     );
 };
 // get hourly room  energyConsumption for carbon-offset old-version
-const hourlyRoomEnergyConsumption = (id, startDate, endDate) => {
-   console.log(id, startDate, endDate, "carbon");
+const hourlyRoomEnergyConsumption = (hotelId,id, startDate, endDate) => {
   return con1
     .promise()
     .query(
-      `SELECT energyConsumption,startTs as ts,roomType from resulted_data where roomNo=${id} and startTs between '${startDate}' and '${endDate}'`
+      `SELECT energyConsumption,startTs as ts,roomType from resulted_data as result
+      left join room_info as room on room.room_no = result.roomNo
+      where room.hotel_id=${hotelId} and result.roomNo=${id} and result.startTs between '${startDate}' and '${endDate}'`
     );
 };
 // get room info by id
 const getRoomInfoById = (room_id, hotel_id) => {
+  console.log(room_id,hotel_id,'query')
   return con1
     .promise()
     .query(
@@ -199,8 +203,10 @@ const getRoomInfo = () => {
 
 // get hotel-info
 const getHotelInfo = () => {
-  return con1.promise().query(`select * from hotel_info`);
+  return con1.promise()
+  .query(`select hotel.*,room.room_no from hotel_info as hotel left join room_info as room  on hotel.hotel_id = room.hotel_id `);
 };
+
 
 // post guest-detail
 const postGuestDetail = (
@@ -219,11 +225,11 @@ const postGuestDetail = (
     );
 };
 // get guest-info
-const getGuestInfoWithRoomNo = (roomNo,guestId)=>{
+const getGuestInfoWithRoomNo = (roomNo,guestId,hotelId)=>{
   return con1.promise()
   .query(`select concat(guest.first_name,' ',guest.last_name) AS full_name,date_format(guest.checkin_datetime,'%Y-%m-%d %H:%i:%s  %p') as check_in,date_format(guest.checkout_datetime,'%Y-%m-%d %H:%i:%s  %p') as check_out,guest.room_no ,room.room_type  from carbon_offset_db.guest_info as guest
   left join carbon_offset_db.room_info as room  on guest.room_no = room.room_no
-  where room.room_no=${roomNo} and guest.guest_id=${guestId}`)
+  where room.room_no=${roomNo}  and guest.guest_id=${guestId} and room.hotel_id=${hotelId}`)
 }
 
 const newsLetter = (email) => {

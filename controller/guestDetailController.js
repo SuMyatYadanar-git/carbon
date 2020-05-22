@@ -89,15 +89,16 @@ const getGuestInfo = (req, res) => {
   try {
     const roomNo = req.query.room_no;
     const guestId = req.query.guest_id;
+    const hotelId = req.query.hotel_id;
 
-    if (!roomNo || !guestId) {
+    if (!roomNo || !guestId || !hotelId) {
       return res.status(400).json(response({
         success: false,
         error: -1004,
         message: error_code[-1004]
       }))
     }
-    return getGuestService(roomNo, guestId)
+    return getGuestService(roomNo, guestId,hotelId)
       .then((data) => {
         return res
           .status(200)
