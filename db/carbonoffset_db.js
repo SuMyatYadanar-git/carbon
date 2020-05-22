@@ -1,20 +1,20 @@
 const mysql = require("mysql2");
 // mysql.createConnection
-const con1 = mysql.createPool({
-  host: "localhost",
-   user: "root",
-  //  user: "user125",
-  password: "root",
-  database: "carbon_offset_db",
-  waitForConnections: true,
-});
-// const con1 = mysql.createConnection({
+// const con1 = mysql.createPool({
 //   host: "localhost",
-//   user: "kumo99",
+//    user: "root",
+//   //  user: "user125",
 //   password: "root",
 //   database: "carbon_offset_db",
 //   waitForConnections: true,
 // });
+const con1 = mysql.createConnection({
+  host: "localhost",
+  user: "kumo99",
+  password: "root",
+  database: "carbon_offset_db",
+  waitForConnections: true,
+});
 const con3 = mysql.createPool({
   host: "114.32.125.70",
   port: "33061",

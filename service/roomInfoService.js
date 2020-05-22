@@ -553,7 +553,7 @@ const getRoomInfo = () => {
       return data;
     })
     .catch((error) => {
-     
+     throw error;
     });
 };
 // get room info by id
