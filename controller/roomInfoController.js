@@ -4,11 +4,13 @@ const response = require("../config/response");
 const dateFns = require("date-fns");
 
 //api for get room info by id
-const getRoomInfoById = (req, res, next) => {
-    const room_id = req.query.room_no
-    const hotel_id = req.query.hotel_id
 
-    if (!room_id || !hotel_id) {
+const getRoomInfoById = (req, res, next) => {
+    const hotel_id = req.query.hotel_id
+    const room_id = req.query.room_no
+
+if ( !hotel_id || !room_id) {
+
         return next({
             status: 400,
             error: { errno: -1004 }
@@ -18,17 +20,29 @@ const getRoomInfoById = (req, res, next) => {
         //     error: -1004,
         //     message: error_code[-1004]
         // }))
-    }
-    try {
-        roomInfoService.getRoomInfoById(room_id, hotel_id).then(data => {
-            return res.json(response({
-                success: true,
-                payload: data[0]
-            }))
-        }).catch(error => {
+
+    }else 
+        try {
+            roomInfoService.getRoomInfoById(room_id, hotel_id).then(data => {
+                return res.json(response({
+                    success: true,
+                    payload: data[0]
+                }))
+            }).catch(error => {
+                return res.status(500).json(response({
+                    success: false,
+                    error: error.code ? error.errno : -1012,
+                    message: error.code ? error_code[error.errno] : error_code[-1012]
+                }))
+            })
+        }
+        catch (error) {
+            //catching the error such reference error
+
             return next(
                 { status: 500, error: error }
             )
+
         })
     }
     catch (error) {
@@ -47,11 +61,16 @@ const getRoomInfoById = (req, res, next) => {
 }
 
 // api for get energy consumpton by room id ,startdate,enddate
+
 const getRoomEnergyConsumption = (req, res,next) => {
-    const no = req.params.id
+
+    const hotelId = req.query.hotel_id
+    const no = req.query.room_no
     const startDate = req.query.start_date
     const endDate = req.query.end_date
+    console.log(hotelId,'hotel')
     if (!startDate || !endDate) {
+
         
         return next({
             status: 400,
@@ -63,6 +82,7 @@ const getRoomEnergyConsumption = (req, res,next) => {
         //     message: error_code[-1004]
         // }))
     }
+
     else if (!dateFns.isValid(new Date(startDate)) || !dateFns.isValid(new Date(endDate))) {
         return next({
             status: 400,
@@ -84,19 +104,29 @@ const getRoomEnergyConsumption = (req, res,next) => {
         //     message: error_code[-1014]
         // }))
     }
+    else if(!hotelId ){
+        return res.status(400).json(response({
+            success: false,
+            error: -1004,
+            message: error_code[-1004]
+        }))
+    }
     try {
-        return roomInfoService.getRoomEnergyConsumption(no, startDate, endDate).then(data => {
+
+        return roomInfoService.getRoomEnergyConsumption(hotelId,no, startDate, endDate).then(data => {
             return res.json(response({
                 success: true,
                 payload: data[0].map(v => {
                     return ({
                         ts: format(new Date(v.ts), "yyyy-MM-dd HH:mm"),
+
                         kWh: v.energyConsumption.toFixed(3),
                         dataColor: v.dataColor,
                     })
                 })
             }))
         }).catch(error => {
+
 
             return next(
                 { status: 500, error: error }
@@ -110,6 +140,7 @@ const getRoomEnergyConsumption = (req, res,next) => {
 
     } catch (error) {
 
+
         return next({ status: 500, error: { errno: -1003 } })
 
         // return res.status(500).json(response({
@@ -121,12 +152,16 @@ const getRoomEnergyConsumption = (req, res,next) => {
 }
 
 //get carbon footprint by room id,startdate,enddate
+
 const getRoomCarbonFootPrint = (req, res,next) => {
-    const id = req.params.id
+
+    const hotelId = req.query.hotel_id
+    const id = req.query.room_no
     const startDate = req.query.start_date
     const endDate = req.query.end_date
 
-    if (!startDate || !endDate) {
+    if(!hotelId ){
+
         return next({
             status: 400,
             error: { errno: -1004 }
@@ -137,6 +172,7 @@ const getRoomCarbonFootPrint = (req, res,next) => {
         //     message: error_code[-1004]
         // }))
     }
+
     else if (!dateFns.isValid(new Date(startDate)) || !dateFns.isValid(new Date(endDate))) {
         return next({
             status: 400,
@@ -148,6 +184,7 @@ const getRoomCarbonFootPrint = (req, res,next) => {
         //     message: error_code[-1013]
         // }))
     }
+
     else if (Date.parse(startDate) > Date.parse(endDate)) {
         return next({
             status: 400,
@@ -155,12 +192,14 @@ const getRoomCarbonFootPrint = (req, res,next) => {
         })
     }
     try {
-        return roomInfoService.getRoomCarbonFootPrint(id, startDate, endDate).then(data => {
+
+        return roomInfoService.getRoomCarbonFootPrint(hotelId,id, startDate, endDate).then(data => {
             return res.json(response({
                 success: true,
                 payload: data,
                 error: null,
             }))
+
         }).catch(error => {            
             return next(
                 { status: 500, error: error }
@@ -174,6 +213,7 @@ const getRoomCarbonFootPrint = (req, res,next) => {
 
     } catch (error) {
 
+
         return next({ status: 500, error: { errno: -1003 } })
         // return res.status(500).json(response({
         //     success: false,
@@ -185,6 +225,7 @@ const getRoomCarbonFootPrint = (req, res,next) => {
 }
 
 // get room_data
+
 const getRoomData = (req, res,next) => {
     const startDate = req.query.start_date
     const endDate = req.query.end_date
@@ -192,6 +233,7 @@ const getRoomData = (req, res,next) => {
     const room_id = req.query.room_no
 
     if (!startDate || !endDate || !hotel_id || !room_id) {
+
 
         return next({
             status: 400,
@@ -203,6 +245,7 @@ const getRoomData = (req, res,next) => {
         //     message: error_code[-1004]
         // }))
     }
+
     else if (!dateFns.isValid(new Date(startDate)) || !dateFns.isValid(new Date(endDate))) {
 
         return next({
@@ -227,6 +270,7 @@ const getRoomData = (req, res,next) => {
                 error: null,
             }))
         }).catch(error => {
+
             return next(
                 { status: 500, error: error }
             )
@@ -238,14 +282,17 @@ const getRoomData = (req, res,next) => {
         })
 
     } catch (error) {
+
         return next({ status: 500, error: { errno: -1003 } })
     }
 }
 
 // get hotel_info
+
 const getHotelInfo = (req, res,next) => {
     try {
-        return roomInfoService.getHotelInfoData()
+
+       return roomInfoService.getHotelInfoData()
             .then(data => {
                 return res.json({
                     success: true,
@@ -264,7 +311,9 @@ const getHotelInfo = (req, res,next) => {
                 //     message: error.code ? error_code[error.errno] : error_code[-1012]
                 // }))
             })
+    
     } catch (error) {
+
         return next({ status: 500, error: { errno: -1003 } })
     }
 }

@@ -5,8 +5,8 @@ const postGuestDetailService = (firstName,lastName,roomNumber,checkInDate,checkO
 	return db.postGuestDetail(firstName,lastName,roomNumber,checkInDate,checkOutDate)
 }
 // get guest-detail service
-const getGuestService =(roomNo,guestId)=>{
-	return db.getGuestInfoWithRoomNo(roomNo,guestId)
+const getGuestService =(roomNo,guestId,hotelId)=>{
+	return db.getGuestInfoWithRoomNo(roomNo,guestId,hotelId)
 }
 const getGuestInfoDataService =()=>{
 	return db.guestExits()

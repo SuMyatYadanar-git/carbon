@@ -61,6 +61,7 @@ const postGuestDetail = async (req, res, next) => {
           );
         })
         .catch((error) => {
+
           return next({ status: 500, error:error })
           // return res.status(500).json(response({
           //   success: false,
@@ -69,6 +70,7 @@ const postGuestDetail = async (req, res, next) => {
           // }))
         });
     } else {
+
       return next({ status: 409, error: { errno: -1006 } })
       // return res.status(409).json(
       //   response({
@@ -79,6 +81,7 @@ const postGuestDetail = async (req, res, next) => {
       // );
     }
   } catch (error) {
+
     return next({ status: 500, error: { errno: -1003 } })
     // return res.status(500).json(response({
     //   success: false,
@@ -88,12 +91,16 @@ const postGuestDetail = async (req, res, next) => {
   }
 };
 // get Guest-info at roomNo
+
 const getGuestInfo = (req, res, next) => {
   try {
     const roomNo = req.query.room_no;
     const guestId = req.query.guest_id;
+    const hotelId = req.query.hotel_id;
 
-    if (!roomNo || !guestId) {
+
+    if (!roomNo || !guestId || !hotelId) {
+
       // return res.status(400).json(response({
       //   success: false,
       //   error: -1004,
@@ -104,13 +111,15 @@ const getGuestInfo = (req, res, next) => {
         error: { errno: -1004 }
       })
     }
-    return getGuestService(roomNo, guestId)
+
+    return getGuestService(roomNo, guestId,hotelId)
       .then((data) => {
         return res
           .status(200)
           .json(response({ success: true, payload: data[0] }));
       })
       .catch((error) => {
+
 
         return next(
           { status: 500, error: error }
@@ -123,9 +132,11 @@ const getGuestInfo = (req, res, next) => {
       });
 
   } catch (error) {
+
     return next({ status: 500, error: { errno: -1003 } })
   }
 };
+
 
 const newsLetter = async (req, res, next) => {
   try {
@@ -154,6 +165,7 @@ const newsLetter = async (req, res, next) => {
           );
         })
         .catch((error) => {
+
           return next({ status: 500, error: error })
           // return res.status(500).json(response({
           //   success: false,
@@ -162,6 +174,7 @@ const newsLetter = async (req, res, next) => {
           // }))
         });
     } else {
+
 
       return next({ status: 409, error: { errno: -1006 } })
 
@@ -175,6 +188,7 @@ const newsLetter = async (req, res, next) => {
     }
 
   } catch (error) {
+
     return next({ status: 500, error: { errno: -1003 } })
     // return res.status(500).json(response({
     //   success: false,
@@ -183,6 +197,7 @@ const newsLetter = async (req, res, next) => {
     // }))
   }
 };
+
 
 const postUserFeedback = (req, res, next) => {
   try {
@@ -212,6 +227,7 @@ const postUserFeedback = (req, res, next) => {
         );
       })
       .catch((error) => {
+
         return next({ status: 500, error: error })
         // return res.status(500).json(response({
         //   success: false,
@@ -221,6 +237,7 @@ const postUserFeedback = (req, res, next) => {
         // }))
       });
   } catch (error) {
+
     return next({ status: 500, error: { errno: -1003 } })
     // return res.status(500).json(response({
     //   success: false,
