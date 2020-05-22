@@ -260,7 +260,32 @@ const oneHourScheduler = (currentDate) => {
             }          
 
           } while(maxDate < stDate  & lossData) //(maxDate < stDate & hasData)
+        
+          if(lossData){
+            const resultedData = {
+              roomNo: room.room_no,
+              roomType: room.room_type,
+              officeCoolingLoad:0,
+              hotelCoolingLoad:0,
+              coolingRequired:0,
+              powerDataTotal:0,
+              plantEfficiency:0,
+              energyConsumption:0,
+              startTs: curDate,
+              endTs: dateFns.format(
+                dateFns.subSeconds(currentDate, 1),
+                dateFormat
+              ),
+              dataColor:'-',
+            };
+            const result = await db.saveResultedData(resultedData)
+            if(result[0]){
+              console.log("save previous data success with zeros",room.room_no,curDate)
+              resultedArray.push(resultedData)                     
+            }
+          }
 
+        
         }
         return resultedArray
       }
