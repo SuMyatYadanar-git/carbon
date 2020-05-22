@@ -14,7 +14,7 @@ const {
 const response = require("../config/response");
 const msgInfo = require("../config/msg");
 
-const postGuestDetail = async (req, res) => {
+const postGuestDetail = async (req, res, next) => {
   try {
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
@@ -56,46 +56,53 @@ const postGuestDetail = async (req, res) => {
           return res.status(201).json(
             response({
               message: `Guest info inserted successfully with guest id =${guest_id}`,
-              payload:{guest_id }
+              payload: { guest_id }
             })
           );
         })
         .catch((error) => {
-          return res.status(500).json(response({
-            success: false,
-            error: error.code ? error.errno : -1012,
-            message: error.code ? error_code[error.errno] : error_code[-1012]
-          }))
+          return next({ status: 500, error:error })
+          // return res.status(500).json(response({
+          //   success: false,
+          //   error: error.code ? error.errno : -1012,
+          //   message: error.code ? error_code[error.errno] : error_code[-1012]
+          // }))
         });
     } else {
-      return res.status(409).json(
-        response({
-          success: false,
-          message: error_code[-1006],
-          error: "-1006",
-        })
-      );
+      return next({ status: 409, error: { errno: -1006 } })
+      // return res.status(409).json(
+      //   response({
+      //     success: false,
+      //     message: error_code[-1006],
+      //     error: "-1006",
+      //   })
+      // );
     }
   } catch (error) {
-    return res.status(500).json(response({
-      success: false,
-      error: -1003,
-      message: error_code[-1003]
-    }))
+    return next({ status: 500, error: { errno: -1003 } })
+    // return res.status(500).json(response({
+    //   success: false,
+    //   error: -1003,
+    //   message: error_code[-1003]
+    // }))
   }
 };
 // get Guest-info at roomNo
-const getGuestInfo = (req, res) => {
+const getGuestInfo = (req, res, next) => {
   try {
     const roomNo = req.query.room_no;
     const guestId = req.query.guest_id;
 
     if (!roomNo || !guestId) {
-      return res.status(400).json(response({
-        success: false,
-        error: -1004,
-        message: error_code[-1004]
-      }))
+      // return res.status(400).json(response({
+      //   success: false,
+      //   error: -1004,
+      //   message: error_code[-1004]
+      // }))
+      return next({
+        status: 400,
+        error: { errno: -1004 }
+      })
     }
     return getGuestService(roomNo, guestId)
       .then((data) => {
@@ -104,23 +111,23 @@ const getGuestInfo = (req, res) => {
           .json(response({ success: true, payload: data[0] }));
       })
       .catch((error) => {
-        return res.status(500).json(response({
-          success: false,
-          error: error.code ? error.errno : -1012,
-          message: error.code ? error_code[error.errno] : error_code[-1012]
-        }))
+
+        return next(
+          { status: 500, error: error }
+        )
+        // return res.status(500).json(response({
+        //   success: false,
+        //   error: error.code ? error.errno : -1012,
+        //   message: error.code ? error_code[error.errno] : error_code[-1012]
+        // }))
       });
 
   } catch (error) {
-    return res.status(500).json(response({
-      success: false,
-      error: -1003,
-      message: error_code[-1003]
-    }))
+    return next({ status: 500, error: { errno: -1003 } })
   }
 };
 
-const newsLetter = async (req, res) => {
+const newsLetter = async (req, res, next) => {
   try {
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
@@ -147,32 +154,37 @@ const newsLetter = async (req, res) => {
           );
         })
         .catch((error) => {
-          return res.status(500).json(response({
-            success: false,
-            error: error.code ? error.errno : -1012,
-            message: error.code ? error_code[error.errno] : error_code[-1012]
-          }))
+          return next({ status: 500, error: error })
+          // return res.status(500).json(response({
+          //   success: false,
+          //   error: error.code ? error.errno : -1012,
+          //   message: error.code ? error_code[error.errno] : error_code[-1012]
+          // }))
         });
     } else {
-      return res.status(409).json(
-        response({
-          success: false,
-          message: error_code[-1006],
-          error: "-1006",
-        })
-      );
+
+      return next({ status: 409, error: { errno: -1006 } })
+
+      // return res.status(409).json(
+      //   response({
+      //     success: false,
+      //     message: error_code[-1006],
+      //     error: "-1006",
+      //   })
+      // );
     }
 
   } catch (error) {
-    return res.status(500).json(response({
-      success: false,
-      error: -1003,
-      message: error_code[-1003]
-    }))
+    return next({ status: 500, error: { errno: -1003 } })
+    // return res.status(500).json(response({
+    //   success: false,
+    //   error: -1003,
+    //   message: error_code[-1003]
+    // }))
   }
 };
 
-const postUserFeedback = (req, res) => {
+const postUserFeedback = (req, res, next) => {
   try {
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
@@ -200,19 +212,21 @@ const postUserFeedback = (req, res) => {
         );
       })
       .catch((error) => {
-        return res.status(500).json(response({
-          success: false,
-          error: error.code ? error.errno : -1012,
-          message: error.code ? error_code[error.errno] : error_code[-1012],
-          payload:error
-        }))
+        return next({ status: 500, error: error })
+        // return res.status(500).json(response({
+        //   success: false,
+        //   error: error.code ? error.errno : -1012,
+        //   message: error.code ? error_code[error.errno] : error_code[-1012],
+        //   payload: error
+        // }))
       });
   } catch (error) {
-    return res.status(500).json(response({
-      success: false,
-      error: -1003,
-      message: error_code[-1003]
-    }))
+    return next({ status: 500, error: { errno: -1003 } })
+    // return res.status(500).json(response({
+    //   success: false,
+    //   error: -1003,
+    //   message: error_code[-1003]
+    // }))
   }
 };
 
