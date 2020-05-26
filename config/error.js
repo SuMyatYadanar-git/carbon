@@ -14,6 +14,9 @@ const error_code={
         "-1012":"Something went wrong.",
         "-1013":"Invalid date requested.",
         "-1014":"End date must be greater than start date",
+        "-1015":"User name and password does not match",
+        "-1016":"Not authorized user!",
+        "-1017":"Token expired!",
 
         "1054" :"Unknown column in sql.",
         "1064" :"SQL syntax error.",

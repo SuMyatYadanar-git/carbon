@@ -14,12 +14,6 @@ const getRoomInfoById = (req, res, next) => {
                 status: 400,
                 error: { errno: -1004 }
             })
-            // return res.status(400).json(response({
-            //     success: false,
-            //     error: -1004,
-            //     message: error_code[-1004]
-            // }))
-
         }
         roomInfoService.getRoomInfoById(room_id, hotel_id).then(data => {
             return res.json(response({
@@ -53,32 +47,17 @@ const getRoomEnergyConsumption = (req, res, next) => {
             status: 400,
             error: { errno: -1004 }
         })
-        // return res.status(400).json(response({
-        //     success: false,
-        //     error: -1004,
-        //     message: error_code[-1004]
-        // }))
     }
     else if (!dateFns.isValid(new Date(startDate)) || !dateFns.isValid(new Date(endDate))) {
         return next({
             status: 400,
             error: { errno: -1013 }
         })
-        // return res.status(400).json(response({
-        //     success: false,
-        //     error: -1013,
-        //     message: error_code[-1013]
-        // }))
     } else if (Date.parse(startDate) > Date.parse(endDate)) {
         return next({
             status: 400,
             error: { errno: -1014 }
         })
-        // return res.status(400).json(response({
-        //     success: false,
-        //     error: -1014,
-        //     message: error_code[-1014]
-        // }))
     }
     else if (!hotelId) {
         return next({
@@ -103,19 +82,9 @@ const getRoomEnergyConsumption = (req, res, next) => {
             return next(
                 { status: 500, error: error }
             )
-            // return res.status(500).json(response({
-            //     success: false,
-            //     error: error.code ? error.errno : -1012,
-            //     message: error.code ? error_code[error.errno] : error_code[-1012]
-            // }))
         })
     } catch (error) {
         return next({ status: 500, error: { errno: -1003 } })
-        // return res.status(500).json(response({
-        //     success: false,
-        //     error: -1003,
-        //     message: error_code[-1003]
-        // }))
     }
 }
 
@@ -131,22 +100,12 @@ const getRoomCarbonFootPrint = (req, res, next) => {
             status: 400,
             error: { errno: -1004 }
         })
-        // return res.status(400).json(response({
-        //     success: false,
-        //     error: -1004,
-        //     message: error_code[-1004]
-        // }))
     }
     else if (!dateFns.isValid(new Date(startDate)) || !dateFns.isValid(new Date(endDate))) {
         return next({
             status: 400,
             error: { errno: -1013 }
         })
-        // return res.status(400).json(response({
-        //     success: false,
-        //     error: -1013,
-        //     message: error_code[-1013]
-        // }))
     }
     else if (Date.parse(startDate) > Date.parse(endDate)) {
         return next({
@@ -166,20 +125,9 @@ const getRoomCarbonFootPrint = (req, res, next) => {
             return next(
                 { status: 500, error: error }
             )
-            // return res.status(500).json(response({
-            //     success: false,
-            //     error: error.code ? error.errno : -1012,
-            //     message: error.code ? error_code[error.errno] : error_code[-1012]
-            // }))
         })
     } catch (error) {
         return next({ status: 500, error: { errno: -1003 } })
-        // return res.status(500).json(response({
-        //     success: false,
-        //     error: -1003,
-        //     message: error_code[-1003]
-        // }))
-
     }
 }
 // get hotel_info
@@ -197,11 +145,6 @@ const getHotelInfo = (req, res, next) => {
                 return next(
                     { status: 500, error: error }
                 )
-                // return res.status(500).json(response({
-                //     success: false,
-                //     error: error.code ? error.errno : -1012,
-                //     message: error.code ? error_code[error.errno] : error_code[-1012]
-                // }))
             })
 
     } catch (error) {
@@ -221,11 +164,6 @@ const getRoomData = (req, res, next) => {
             status: 400,
             error: { errno: -1004 }
         })
-        // return res.status(400).json(response({
-        //     success: false,
-        //     error: -1004,
-        //     message: error_code[-1004]
-        // }))
     }
     else if (!dateFns.isValid(new Date(startDate)) || !dateFns.isValid(new Date(endDate))) {
         return next({
@@ -252,11 +190,6 @@ const getRoomData = (req, res, next) => {
             return next(
                 { status: 500, error: error }
             )
-            // return res.status(500).json(response({
-            //     success: false,
-            //     error: error.code ? error.errno : -1012,
-            //     message: error.code ? error_code[error.errno] : error_code[-1012]
-            // }))
         })
 
     } catch (error) {

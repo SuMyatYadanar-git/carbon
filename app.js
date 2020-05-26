@@ -3,6 +3,7 @@ const bodyParser = require("body-parser");
 const morgan = require("morgan");
 const { format } = require('date-fns')
 const cors = require("cors");
+const auth = require('basic-auth')
 const CronJob = require("cron").CronJob;
 const db = require("./db/carbonoffset_db");
 const response = require("./config/response");
@@ -29,8 +30,11 @@ app.use(bodyParser.json());
 app.use(morgan("dev"));
 app.use(router);
 
-app.get('/hi', (req, res) => {
-  return res.json('hello server')
+app.post('/hi', (req, res) => {
+  res.send('hello carbon server api')
+  // const authHeader = req.get('Authorization');
+  // const user =  auth(req)
+  // return res.json({user,authHeader})
 })
 app.get("/one-hour-manual", (req, res) => {
   const endDateQuery = req.query.endDate
@@ -72,7 +76,8 @@ app.use((req, res, next) => {
 
 app.use(async (err, req, res, next) => {
   if (err) {
-    const errors = await db.getErrorCodes(err.error.errno);
+    console.log(err,': iserr-middleware ')
+    const errors = await db.getErrorCodes(err.error.errno === undefined ? -1012 :err.error.errno);
     let dbError = errors[0][0];
     return res.status(err.status).send(response({
       success: false,
@@ -83,7 +88,6 @@ app.use(async (err, req, res, next) => {
   else {
     next();
   }
-
 })
 
 app.listen(port, (err) => {

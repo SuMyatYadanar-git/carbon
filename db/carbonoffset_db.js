@@ -1,20 +1,24 @@
 const mysql = require("mysql2");
+const { produceToken } = require('../security/token')
+const bcrypt = require('bcrypt')
+const saltRounds = 10;
+
 // mysql.createConnection
-// const con1 = mysql.createPool({
-//   host: "localhost",
-//    user: "root",
-//   //  user: "user125",
-//   password: "root",
-//   database: "carbon_offset_db",
-//   waitForConnections: true,
-// });
-const con1 = mysql.createConnection({
+const con1 = mysql.createPool({
   host: "localhost",
-  user: "kumo99",
+   user: "root",
+  //  user: "user125",
   password: "root",
   database: "carbon_offset_db",
   waitForConnections: true,
 });
+// const con1 = mysql.createConnection({
+//   host: "localhost",
+//   user: "kumo99",
+//   password: "root",
+//   database: "carbon_offset_db",
+//   waitForConnections: true,
+// });
 const con3 = mysql.createPool({
   host: "114.32.125.70",
   port: "33061",
@@ -241,7 +245,7 @@ const postUserFeedback = (hours, room_temp, hotel_temp, guestId,hotelId,roomNo) 
 };
 
 const getLastTimeData = (query) => {
-  console.log(query);
+  // console.log(query);
   return con1
     .promise()
     .query(query);
@@ -249,6 +253,40 @@ const getLastTimeData = (query) => {
 const getErrorCodes = (code=-1012) => {
   const query = `select * from error_tbl where error_code=${code}`;
   return con1.promise().query(query);
+}
+
+const userSignup=(user)=>{
+  // console.log(user,'userquery')
+  const hash = bcrypt.hashSync(user.password, saltRounds);
+  const query = `insert into user(user_name,password,hash_password,email) values('${user.name}', '${user.password}','${hash}','${user.email}')`
+  return con1.promise().query(query);
+}
+
+const allUser = ()=>{
+  const query = `select * from user`
+  return con1.promise().query(query);
+}
+
+const login=(user,callback)=>{
+  const query = `select * from user where user_name='${user.name}'`
+  return con1.promise().query(query,(error,results,fields)=>{
+    if(error) return callback(error,null)
+    else if(!(results.length && bcrypt.compareSync(user.password,results[0].hash_password))){
+      return callback('User name and password does not match.',null)
+    }
+    const payload ={
+      username : results[0].user_name,
+      email:results[0].email
+    }
+    const token = produceToken(payload);
+    const data = {
+      token: token,
+      user_name: results[0].user_name,
+      email: results[0].email,
+    }
+    return callback(null, data)
+
+  })
 }
 // ====================================================================================================================================================================
 
@@ -272,5 +310,9 @@ module.exports = {
   pingAllDBs,
   getLastTimeData,
   guestExits,
-  getErrorCodes
+  getErrorCodes,
+  // ////////////
+  allUser,
+  userSignup,
+  login
 };
