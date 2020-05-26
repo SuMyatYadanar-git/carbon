@@ -9,7 +9,7 @@ const produceToken = (payload) => {
 
 const verifyToken = (token, callback) => {
     jwt.verify(token, publicKey, (err, res) => {
-        console.log(err,'token err')
+        // console.log(err,'token err')
         if (err) callback(err, null)
         else callback(null, res)
     })

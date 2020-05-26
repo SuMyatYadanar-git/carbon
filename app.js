@@ -30,11 +30,8 @@ app.use(bodyParser.json());
 app.use(morgan("dev"));
 app.use(router);
 
-app.post('/hi', (req, res) => {
+app.get('/hi', (req, res) => {
   res.send('hello carbon server api')
-  // const authHeader = req.get('Authorization');
-  // const user =  auth(req)
-  // return res.json({user,authHeader})
 })
 app.get("/one-hour-manual", (req, res) => {
   const endDateQuery = req.query.endDate
@@ -50,9 +47,9 @@ app.get("/one-hour-manual", (req, res) => {
           if (resultedData.filter(v => !v).length > 0) {
             res.json({ error: "Not Success", error: error.toString() })
           }
-          else res.json(resultedData)
+          else res.status(200).json(resultedData)
         })
-        .catch(error => res.json({ error: error.toString() }))
+        .catch(error => res.status(400).json({ error: error.toString() }))
 
     })
     .catch((error) => res.status(400).json({ error: error.toString() }));
@@ -64,7 +61,6 @@ const job0 = new CronJob("0 10 * * * *", () => {
   return db.pingAllDBs()
 });
 const job1 = new CronJob("0 0 */1 * * *", service.oneHourSchedulerAuto);
-//  const job1 = new CronJob("0 0 */1 * * *", service.oneHourSchedulerAuto);
 
 app.use((req, res, next) => {
   return res.status(404).send(response({
@@ -77,7 +73,7 @@ app.use((req, res, next) => {
 app.use(async (err, req, res, next) => {
   if (err) {
     console.log(err,': iserr-middleware ')
-    const errors = await db.getErrorCodes(err.error.errno === undefined ? -1012 :err.error.errno);
+    const errors = await db.getErrorCodes(err===  undefined ? -1012 :err.error.errno);
     let dbError = errors[0][0];
     return res.status(err.status).send(response({
       success: false,

@@ -68,7 +68,7 @@ const postGuestDetail = async (req, res, next) => {
                   last_name: lastName,
                   check_in: checkInDate,
                   check_out: checkOutDate,
-                  room_no: roomNo,
+                  room_no: roomNumber,
                   hotel_id: hotelId,
                 },
                 message: `Guest info inserted successfully with guest id =${guest_id}`,
