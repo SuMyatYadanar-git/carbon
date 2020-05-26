@@ -73,7 +73,7 @@ app.use((req, res, next) => {
 app.use(async (err, req, res, next) => {
   if (err) {
     console.log(err,': iserr-middleware ')
-    const errors = await db.getErrorCodes(err===  undefined ? -1012 :err.error.errno);
+    const errors = await db.getErrorCodes(err.error.errno ===  undefined ? -1012 :err.error.errno);
     let dbError = errors[0][0];
     return res.status(err.status).send(response({
       success: false,
